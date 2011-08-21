@@ -1,8 +1,8 @@
 package org.apache.cxf.transport.xmpp.chat;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringBufferInputStream;
 
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.ExchangeImpl;
@@ -17,12 +17,7 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManagerListener;
 import org.jivesoftware.smack.MessageListener;
-import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
-import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.packet.IQ;
-import org.jivesoftware.smack.packet.Packet;
-import org.jivesoftware.smackx.workgroup.settings.GenericSettings;
 
 /**
  * Listens for XMPP IQ packets targeted for this service.
@@ -31,11 +26,8 @@ import org.jivesoftware.smackx.workgroup.settings.GenericSettings;
  * 
  * @author Leon Doud
  */
-public class XMPPDestination implements Destination, PacketListener
+public class XMPPDestination implements Destination
 {
-    private static final String XMPP_CHAT_MSG = "org.apache.cxf.transport.xmpp.XMPPDestination.CHAT";
-    // Set during construction.
-    private EndpointInfo epInfo;
     private XMPPConnection xmppConnection;
     
     // Values initialized during construction. 
@@ -47,30 +39,12 @@ public class XMPPDestination implements Destination, PacketListener
     public XMPPDestination(XMPPConnection xmppConnection, EndpointInfo epInfo)
     {
         this.xmppConnection = xmppConnection;
-        this.epInfo = epInfo;
         
         // Initialize the address of the epRefType member.
         AttributedURIType address = new AttributedURIType();
         address.setValue(epInfo.getAddress());
         epRefType.setAddress(address);
-        
-        // Receive SOAP via IQ.
-//        xmppConnection.addPacketListener(this, new PacketFilter() {
-//            
-//            @Override
-//            public boolean accept(Packet msg)
-//            {                
-//                // TODO Make a real filter.
-//                if (msg instanceof GenericSettings)
-//                {
-//                    System.out.println("Filter accepted packet: "+msg.toXML());
-//                    return true;
-//                }
-//                
-//                System.out.println("Filter rejected packet: "+msg.toXML());
-//                return false;
-//            }
-//        });
+     
         
         // Receive SOAP via chat.
         xmppConnection.getChatManager().addChatListener(new ChatManagerListener() {
@@ -88,17 +62,12 @@ public class XMPPDestination implements Destination, PacketListener
                         Message cxfMsg = new MessageImpl();
                         cxfMsg.setContent(
                                 InputStream.class, 
-                                new StringBufferInputStream(message.getBody())
+                                new ByteArrayInputStream(message.getBody().getBytes())
                         );        
-                      
                         
                         Exchange msgExchange = new ExchangeImpl();
                         msgExchange.setConduit(new XMPPBackChannelConduit(chat));
-//                        msgExchange.setSynchronous(false);
                         cxfMsg.setExchange(msgExchange);
-                        
-                        
-                        //TODO properly set the rest of the CXF message.
                         
                         msgObserver.onMessage(cxfMsg);
                         
@@ -108,7 +77,6 @@ public class XMPPDestination implements Destination, PacketListener
             }
         });
         
-//        System.out.println("XMPP Destination created for: "+xmppConnection.getUser());
     }
     
     /**
@@ -132,6 +100,9 @@ public class XMPPDestination implements Destination, PacketListener
     }
 
     /**
+     * Not used.
+     * The back channel is set on the exchange of the message 
+     * when the message is received.
      * Required by the Destination interface.
      * @see org.apache.cxf.transport.Destination
      */
@@ -139,7 +110,6 @@ public class XMPPDestination implements Destination, PacketListener
     public Conduit getBackChannel(Message inMsg, Message notUsedMsg,
             EndpointReferenceType notUsedEpRefType) throws IOException
     {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -154,55 +124,14 @@ public class XMPPDestination implements Destination, PacketListener
     }
 
     /**
-     * The destination will stop listening for XMPP packets.
+     * Log out of XMPP.
      * Required by the Destination interface.
      * @see org.apache.cxf.transport.Destination
      */
     @Override
     public void shutdown()
     {
-        xmppConnection.removePacketListener(this);
+       xmppConnection.disconnect();
     }
 
-    /**
-     * Triggered when an XMPP packet matching the filter is received.
-     * This method is serviced by one thread so the processing 
-     * should be kept to a minimum.
-     * Required by the PacketListener interface.
-     * @see org.jivesoftware.smack.PacketListener
-     */
-    @Override
-    public void processPacket(Packet msg)
-    {
-        
-        
-        // Blind cast is fine because the filter checks this.
-        GenericSettings iqMsgWithSoap = (GenericSettings)msg; 
-        System.out.println("Accepted packet with: "+iqMsgWithSoap.getQuery());
-        
-        Message cxfMsg = new MessageImpl();
-        cxfMsg.setContent(
-                InputStream.class, 
-//                new StringBufferInputStream(iqMsgWithSoap.getChildElementXML())
-//                new StringBufferInputStream(message)
-                  new StringBufferInputStream(iqMsgWithSoap.getQuery())
-        );
-        
-//        Exchange msgExchange = cxfMsg.getExchange();
-//        msgExchange.setConduit(arg0);
-//        msgExchange.setDestination(this);
-//        msgExchange.setInMessage(cxfMsg);
-//        msgExchange.setSynchronous(true);
-     
-        msgObserver.onMessage(cxfMsg);
-    }
-    
-    private static String message = 
-    "<soap:Envelope xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/'>"+
-    "<soap:Body>"+
-    "<test:sayHi xmlns:test='http://server.xmpp.test/'>"+
-   "        <arg0>World</arg0>"+
-    "</test:sayHi>"+
-    "</soap:Body>"+
-    "</soap:Envelope>";
 }
