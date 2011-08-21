@@ -1,6 +1,6 @@
 package test.xmpp.client;
 
-import org.apache.cxf.transport.xmpp.XMPPBackChannelConduit;
+import org.apache.cxf.transport.xmpp.chat.XMPPBackChannelConduit;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.MessageListener;

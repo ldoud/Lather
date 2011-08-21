@@ -1,4 +1,4 @@
-package org.apache.cxf.transport.xmpp;
+package org.apache.cxf.transport.xmpp.chat;
 
 import java.io.IOException;
 import java.io.OutputStream;

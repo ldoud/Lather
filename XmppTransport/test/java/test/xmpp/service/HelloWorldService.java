@@ -1,10 +1,10 @@
-package test.xmpp.server;
+package test.xmpp.service;
 
 import javax.jws.WebParam;
 import javax.jws.WebService;
 
 @WebService(
-        endpointInterface = "test.xmpp.server.HelloWorld", 
+        endpointInterface = "test.xmpp.service.HelloWorld", 
         serviceName = "HelloWorld")
 public class HelloWorldService implements HelloWorld
 {

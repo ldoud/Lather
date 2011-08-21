@@ -1,4 +1,4 @@
-package test.xmpp.server;
+package test.xmpp.service;
 
 import javax.jws.WebService;
 
