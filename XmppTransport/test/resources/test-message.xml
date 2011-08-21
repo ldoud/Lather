@@ -1,0 +1,7 @@
+<soap:Envelope xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/'>
+   <soap:Body>
+     <test:sayHi xmlns:test='http://server.xmpp.test/'>
+          <arg0>World</arg0>
+     </test:sayHi>
+   </soap:Body>
+</soap:Envelope>
