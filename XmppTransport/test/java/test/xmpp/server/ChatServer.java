@@ -1,4 +1,4 @@
-package test.xmpp.chat;
+package test.xmpp.server;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
