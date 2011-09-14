@@ -26,7 +26,7 @@
 
     <cxf:bus bus="cxf"/>
     
-    <bean class="org.apache.cxf.transport.xmpp.iq.XMPPTransportFactory">
+    <bean class="org.xmpp.cxf.transport.xmpp.iq.XMPPTransportFactory">
     	<property name="bus" ref="cxf"/>
     </bean>
 

@@ -1,6 +1,5 @@
 package test.xmpp.client;
 
-import org.apache.cxf.transport.xmpp.chat.XMPPBackChannelConduit;
 import org.jivesoftware.smack.Chat;
 import org.jivesoftware.smack.ChatManager;
 import org.jivesoftware.smack.MessageListener;
@@ -9,6 +8,7 @@ import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
 import org.jivesoftware.smackx.packet.SoapPacket;
 import org.jivesoftware.smackx.workgroup.settings.GenericSettings;
+import org.xmpp.cxf.transport.xmpp.chat.XMPPBackChannelConduit;
 
 public class TestClient
 {

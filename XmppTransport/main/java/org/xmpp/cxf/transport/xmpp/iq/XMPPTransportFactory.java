@@ -1,4 +1,4 @@
-package org.apache.cxf.transport.xmpp.iq;
+package org.xmpp.cxf.transport.xmpp.iq;
 
 import java.io.IOException;
 import java.util.Arrays;
