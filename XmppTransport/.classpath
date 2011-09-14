@@ -9,5 +9,6 @@
 	<classpathentry kind="lib" path="/home/ic2te/smack_3_2_1/smackx.jar"/>
 	<classpathentry kind="lib" path="/home/ic2te/apache-cxf-2.4.1/lib/spring-context-3.0.5.RELEASE.jar"/>
 	<classpathentry kind="lib" path="/home/ic2te/apache-cxf-2.4.1/lib/spring-core-3.0.5.RELEASE.jar"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/SmackSoap"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

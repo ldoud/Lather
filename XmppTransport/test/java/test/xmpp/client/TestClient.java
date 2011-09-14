@@ -7,42 +7,42 @@ import org.jivesoftware.smack.MessageListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smackx.packet.SoapPacket;
 import org.jivesoftware.smackx.workgroup.settings.GenericSettings;
 
 public class TestClient
 {
     public static void main(String[] args) throws Exception
     {
+
+//        XMPPConnection.DEBUG_ENABLED = true;
+        
         XMPPConnection xmppConnection = new XMPPConnection("localhost.localdomain");
+//        XMPPConnection xmppConnection = new XMPPConnection();
+
         xmppConnection.connect();
         xmppConnection.login("user1", "user1");
         System.out.println("Logged in as:"+xmppConnection.getUser());
         
+
         
-        GenericSettings iqPacket = new GenericSettings();
-        iqPacket.setTo("service1@127.0.0.1");
-        iqPacket.setQuery("message");
+        SoapPacket iqPacket = new SoapPacket();
+        iqPacket.setTo("service1@localhost.localdomain");
+        iqPacket.setEnvelope(message);
+//        iqPacket.setPacketID(Math.random()+"");
         xmppConnection.sendPacket(iqPacket);
+       
         System.out.println("Sent IQ Packet");
         
-        
-        Chat chat = xmppConnection.getChatManager().createChat("service1@127.0.0.1", new MessageListener() {
-            
-            @Override
-            public void processMessage(Chat chat, Message message) {
-                System.out.println("Received message: " + message);
-            }
-        });
-        System.out.println("Created chat");
-        
         Thread.sleep(10000);
+        xmppConnection.disconnect();
 
     }
     
     private static String message = 
-        "<soap:Envelope xmlns:soap='http://schemas.xmlsoap.org/soap/envelope/'>"+
+        "<soap:Envelope xmlns:soap='http://www.w3.org/2003/05/soap-envelope'>"+
         "<soap:Body>"+
-        "<test:sayHi xmlns:test='http://server.xmpp.test/'>"+
+        "<test:sayHi xmlns:test='http://service.xmpp.test/'>"+
        "        <arg0>World</arg0>"+
         "</test:sayHi>"+
         "</soap:Body>"+
