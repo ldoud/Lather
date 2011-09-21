@@ -1,4 +1,4 @@
-package lather.smackx.provider;
+package lather.smackx.soap;
 
 import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.provider.IQProvider;
@@ -10,7 +10,6 @@ public class SoapProvider implements IQProvider
     @Override
     public IQ parseIQ(XmlPullParser parser) throws Exception
     {
-        // TODO Auto-generated method stub
         return null;
     }
 

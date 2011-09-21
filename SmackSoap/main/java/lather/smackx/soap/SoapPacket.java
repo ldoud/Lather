@@ -1,4 +1,4 @@
-package lather.smackx.provider;
+package lather.smackx.soap;
 
 import org.jivesoftware.smack.packet.IQ;
 
