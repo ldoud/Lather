@@ -1,4 +1,4 @@
-package org.jivesoftware.smackx.packet;
+package lather.smackx.packet;
 
 import org.jivesoftware.smack.packet.IQ;
 

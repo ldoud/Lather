@@ -1,4 +1,4 @@
-package org.xmpp.cxf.transport.xmpp.iq;
+package lather.xmpp.cxf.transport.xmpp.iq;
 
 import java.io.IOException;
 import java.io.OutputStream;

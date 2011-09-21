@@ -1,4 +1,4 @@
-package org.xmpp.cxf.transport.xmpp.chat;
+package lather.xmpp.cxf.transport.xmpp.chat;
 
 import java.io.IOException;
 import java.io.OutputStream;
