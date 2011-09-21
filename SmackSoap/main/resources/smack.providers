@@ -3,6 +3,6 @@
      <iqProvider>
          <elementName>Envelope</elementName>
          <namespace>http://www.w3.org/2003/05/soap-envelope</namespace>
-         <className>org.jivesoftware.smackx.packet.SoapPacket</className>
+         <className>lather.smackx.soap.SoapPacket</className>
      </iqProvider>
  </smackProviders>

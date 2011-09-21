@@ -51,7 +51,8 @@ public class XMPPTransportFactory extends AbstractTransportFactory implements De
         
         // Log into XMPP.
         xmppConnection.connect();
-        xmppConnection.login(username, password);       
+        xmppConnection.login(username, password);   
+        System.out.println("Logged in as:"+xmppConnection.getUser());
     }
     
     @Resource(name = "cxf")
