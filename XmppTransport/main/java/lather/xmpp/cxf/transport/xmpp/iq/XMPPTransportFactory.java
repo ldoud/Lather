@@ -8,6 +8,8 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
+import lather.smackx.soap.SoapPacket;
+
 import org.apache.cxf.Bus;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractTransportFactory;
@@ -15,6 +17,7 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.provider.ProviderManager;
 
 /**
  * After receiving a Bus reference this class registers itself as an XMPPDestination.
@@ -53,6 +56,31 @@ public class XMPPTransportFactory extends AbstractTransportFactory implements De
         xmppConnection.connect();
         xmppConnection.login(username, password);   
         System.out.println("Logged in as:"+xmppConnection.getUser());
+        
+        ProviderManager.getInstance().addIQProvider("Envelope", "http://www.w3.org/2003/05/soap-envelope", SoapPacket.class);
+
+        for (Object provider : ProviderManager.getInstance().getIQProviders())
+        {
+            System.out.println("Provider: "+provider.getClass().getName());
+            if (provider instanceof Class)
+            {
+                try
+                {
+                    System.out.println("Underlying class: "+((Class)provider).newInstance().getClass().getName());
+                }
+                catch (InstantiationException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+                catch (IllegalAccessException e)
+                {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            }
+        }
+        
     }
     
     @Resource(name = "cxf")

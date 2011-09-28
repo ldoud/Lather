@@ -10,13 +10,13 @@ import org.jivesoftware.smack.packet.Packet;
 public class TestClient implements PacketListener
 {
     private static String message = 
-        "<soap:Envelope xmlns:soap='http://www.w3.org/2003/05/soap-envelope'>"+
-        "<soap:Body>"+
+        "<Envelope xmlns=\"http://www.w3.org/2003/05/soap-envelope\">"+
+        "<Body>"+
         "<test:sayHi xmlns:test='http://service.xmpp.test/'>"+
        "        <arg0>World</arg0>"+
         "</test:sayHi>"+
-        "</soap:Body>"+
-        "</soap:Envelope>";
+        "</Body>"+
+        "</Envelope>";
 
     private String prefix;
     
@@ -58,7 +58,7 @@ public class TestClient implements PacketListener
         });
         
         SoapPacket iqPacket = new SoapPacket();
-        iqPacket.setTo("service1@localhost.localdomain");
+        iqPacket.setTo("service1@localhost.localdomain/Smack");
         iqPacket.setEnvelope(message);
 //        iqPacket.setFrom("user1@localhost.localdomain");
         xmppConnection.sendPacket(iqPacket);
