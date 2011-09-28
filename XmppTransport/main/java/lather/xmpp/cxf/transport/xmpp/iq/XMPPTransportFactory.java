@@ -9,6 +9,7 @@ import java.util.Set;
 import javax.annotation.Resource;
 
 import lather.smackx.soap.SoapPacket;
+import lather.smackx.soap.SoapProvider;
 
 import org.apache.cxf.Bus;
 import org.apache.cxf.service.model.EndpointInfo;
@@ -57,7 +58,7 @@ public class XMPPTransportFactory extends AbstractTransportFactory implements De
         xmppConnection.login(username, password);   
         System.out.println("Logged in as:"+xmppConnection.getUser());
         
-        ProviderManager.getInstance().addIQProvider("Envelope", "http://www.w3.org/2003/05/soap-envelope", SoapPacket.class);
+        ProviderManager.getInstance().addIQProvider("Envelope", "http://www.w3.org/2003/05/soap-envelope", new SoapProvider());
 
         for (Object provider : ProviderManager.getInstance().getIQProviders())
         {
