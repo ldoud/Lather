@@ -1,22 +1,24 @@
 package test.xmpp.client;
 
 import lather.smackx.soap.SoapPacket;
+import lather.smackx.soap.SoapProvider;
 
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.provider.ProviderManager;
 
 public class TestClient implements PacketListener
 {
     private static String message = 
-        "<Envelope xmlns=\"http://www.w3.org/2003/05/soap-envelope\">"+
-        "<Body>"+
+        "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\">"+
+        "<soap:Body>"+
         "<test:sayHi xmlns:test='http://service.xmpp.test/'>"+
        "        <arg0>World</arg0>"+
         "</test:sayHi>"+
-        "</Body>"+
-        "</Envelope>";
+        "</soap:Body>"+
+        "</soap:Envelope>";
 
     private String prefix;
     
@@ -38,6 +40,9 @@ public class TestClient implements PacketListener
         xmppConnection.connect();
         xmppConnection.login("user1", "user1");
         System.out.println("Logged in as:"+xmppConnection.getUser());
+        
+        // TODO Remove this hack and properly configure this.
+        ProviderManager.getInstance().addIQProvider("Envelope", "http://www.w3.org/2003/05/soap-envelope", new SoapProvider());
         
         xmppConnection.addPacketListener(new TestClient("Received"), new PacketFilter() {            
             @Override

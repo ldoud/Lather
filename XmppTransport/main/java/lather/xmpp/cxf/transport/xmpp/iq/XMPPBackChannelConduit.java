@@ -3,23 +3,28 @@ package lather.xmpp.cxf.transport.xmpp.iq;
 import java.io.IOException;
 import java.io.OutputStream;
 
+import lather.smackx.soap.SoapPacket;
+
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
-import org.jivesoftware.smack.Chat;
-import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.packet.IQ;
+import org.jivesoftware.smack.packet.IQ.Type;
 
 public class XMPPBackChannelConduit implements Conduit
 {
     private MessageObserver msgObserver = null;
-    private Chat xmppChat;
+    private SoapPacket soapMsg;
+    private XMPPConnection connection;
     
-    public XMPPBackChannelConduit(Chat xmppChat)
+    public XMPPBackChannelConduit(SoapPacket soapMsg, XMPPConnection connection)
     {
-        this.xmppChat = xmppChat;
+        this.soapMsg = soapMsg;
+        this.connection = connection;
     }
     
     @Override
@@ -53,15 +58,16 @@ public class XMPPBackChannelConduit implements Conduit
         StringBuilder replyMsg = new StringBuilder();
         soapResponse.writeCacheTo(replyMsg);
         
-        try
-        {
-            System.out.println("Sending chat response: "+replyMsg.toString());
-            xmppChat.sendMessage(replyMsg.toString());
-        }
-        catch (XMPPException e)
-        {
-            throw new IOException(e);
-        }        
+       
+        SoapPacket responseIQ = new SoapPacket();
+        responseIQ.setType(IQ.Type.RESULT);
+        responseIQ.setPacketID(soapMsg.getPacketID());
+        responseIQ.setFrom(soapMsg.getTo());
+        responseIQ.setTo(soapMsg.getFrom());
+        responseIQ.setEnvelope(replyMsg.toString());
+        System.out.println("Sending response: "+responseIQ.toXML());
+        
+        connection.sendPacket(responseIQ);
     }
 
     @Override

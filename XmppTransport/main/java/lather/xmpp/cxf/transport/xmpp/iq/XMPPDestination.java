@@ -1,8 +1,16 @@
 package lather.xmpp.cxf.transport.xmpp.iq;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 
+import lather.smackx.soap.SoapPacket;
+import lather.xmpp.cxf.transport.xmpp.iq.XMPPBackChannelConduit;
+
+import org.apache.cxf.message.Exchange;
+import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
@@ -110,6 +118,20 @@ public class XMPPDestination implements Destination, PacketListener
     public void processPacket(Packet msg)
     {
        System.out.println("Packet received: "+msg.toXML());
+       
+       SoapPacket soapMsg = (SoapPacket)msg;
+       
+       Message cxfMsg = new MessageImpl();
+       cxfMsg.setContent(
+               InputStream.class, 
+               new ByteArrayInputStream(soapMsg.getChildElementXML().getBytes())
+       );        
+       
+       Exchange msgExchange = new ExchangeImpl();
+       msgExchange.setConduit(new XMPPBackChannelConduit(soapMsg, xmppConnection));
+       cxfMsg.setExchange(msgExchange);
+       
+       msgObserver.onMessage(cxfMsg);       
         
     }
 
