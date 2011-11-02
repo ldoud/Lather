@@ -33,6 +33,8 @@ import org.jivesoftware.smack.provider.ProviderManager;
 public class XMPPTransportFactory extends AbstractTransportFactory 
     implements DestinationFactory, ConduitInitiator
 {
+    private static final String CLIENT_CONDUIT_XMPP_CONNECTION = "xmpp.transport.client_conduit_connection";
+
     public static final List<String> DEFAULT_NAMESPACES = Arrays.asList(
         "http://cxf.apache.org/transports/xmpp");
     
@@ -60,6 +62,9 @@ public class XMPPTransportFactory extends AbstractTransportFactory
                 new SoapProvider());
     }
     
+    /**
+     * Set the bus used via Spring configuration.
+     */
     @Resource(name = "cxf")
     public void setBus(Bus bus) 
     {
@@ -67,17 +72,20 @@ public class XMPPTransportFactory extends AbstractTransportFactory
     }    
     
     /**
-     * {@inheritDoc}
+     * Creates a destination for a service that has its own XMPP connection.
      */
     public Destination getDestination(EndpointInfo endpointInfo) 
         throws IOException 
     {
         // The resource portion of the JID is the QName of the service.
         XMPPConnection xmppConnection = connectToXmpp(endpointInfo.getName().toString());
-        System.out.println("Destination logged in as:"+xmppConnection.getUser());
         return new XMPPDestination(xmppConnection, endpointInfo);
     }
-
+    
+    /**
+     * Creates a conduit for a client that all share a single XMPP connection.
+     * The connection is shared via the bus.
+     */
     @Override
     public Conduit getConduit(EndpointInfo endpointInfo) 
         throws IOException
@@ -85,30 +93,68 @@ public class XMPPTransportFactory extends AbstractTransportFactory
         return getConduit(endpointInfo, endpointInfo.getTarget());
     }
 
+    /**
+     * Creates a conduit for a client that all share a single XMPP connection.
+     * The connection is shared via the bus.
+     */
     @Override
     public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType endpointType)
             throws IOException
     {
-        XMPPConnection xmppConnection = connectToXmpp(endpointInfo.getName().toString());
-        System.out.println("Destination logged in as:"+xmppConnection.getUser());
-        return new XMPPClientConduit(endpointInfo, endpointType, xmppConnection);
+        Bus bus = getBus();
+        
+        // Synchronize in case initialization is necessary.
+        synchronized (bus)
+        {
+            // All clients share their XMPP connection via the bus.
+            XMPPConnection connection = 
+                (XMPPConnection)bus.getProperty(CLIENT_CONDUIT_XMPP_CONNECTION);
+            
+            // Initialize if necessary.
+            if (connection == null || !connection.isConnected())
+            {
+                connection = connectToXmpp(bus.getId()+"-client");
+                bus.setProperty(CLIENT_CONDUIT_XMPP_CONNECTION, connection);
+            }
+            
+            return new XMPPClientConduit(endpointInfo, endpointType, connection);
+        }
     }    
     
+    /**
+     * Required configuration option for connecting to the XMPP server.
+     * @param xmppServiceName The full name of the XMPP server.
+     */
     public void setXmppServiceName(String xmppServiceName)
     {
         this.xmppServiceName = xmppServiceName;
     }
     
+    /**
+     * Required configuration option for connecting to the XMPP server.
+     * @param xmppUsername The username for the XMPP connection.
+     */
     public void setXmppUsername(String xmppUsername)
     {
         this.xmppUsername = xmppUsername;
     }
     
+    /**
+     * Required configuration option for connecting to the XMPP server.
+     * @param xmppPassword The password for the XMPP connection.
+     */
     public void setXmppPassword(String xmppPassword)
     {
         this.xmppPassword = xmppPassword;
     }    
     
+    /**
+     * Creates an XMPP connection to be use by one destination or conduit.
+     * 
+     * @param resourceName This is the last portion of a full JID.
+     * @return The XMPP connection to be used by a destination or conduit.
+     * @throws IOException If the XMPP error occurs during login.
+     */
     private XMPPConnection connectToXmpp(String resourceName)
         throws IOException
     {
@@ -116,7 +162,8 @@ public class XMPPTransportFactory extends AbstractTransportFactory
         
         try
         {
-            // Login to the XMMP server using the username and password from the configuration.
+            // Login to the XMMP server using the username 
+            // and password from the configuration.
             xmppConnection.connect();
             xmppConnection.login(
                     xmppUsername, 
@@ -127,6 +174,7 @@ public class XMPPTransportFactory extends AbstractTransportFactory
         {
             throw new IOException(xmppError);
         }
+        
         return xmppConnection;
     }        
 }
