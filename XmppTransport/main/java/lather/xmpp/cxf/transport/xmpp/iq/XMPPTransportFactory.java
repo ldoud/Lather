@@ -13,21 +13,25 @@ import lather.smackx.soap.SoapProvider;
 import org.apache.cxf.Bus;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.AbstractTransportFactory;
+import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
+import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.provider.ProviderManager;
 
 /**
- * After receiving a Bus reference this class registers itself as an XMPPDestination.
+ * Creates both XMPP destinations for servers and conduits for clients.
  * 
  * Web service providers that use one of the XMPP URI prefixes will  
  * trigger the use of this factory for creation of XMPPDestination.
  * 
  * @author Leon Doud
  */
-public class XMPPTransportFactory extends AbstractTransportFactory implements DestinationFactory
+public class XMPPTransportFactory extends AbstractTransportFactory 
+    implements DestinationFactory, ConduitInitiator
 {
     public static final List<String> DEFAULT_NAMESPACES = Arrays.asList(
         "http://cxf.apache.org/transports/xmpp");
@@ -65,27 +69,29 @@ public class XMPPTransportFactory extends AbstractTransportFactory implements De
     /**
      * {@inheritDoc}
      */
-    public Destination getDestination(EndpointInfo endpointInfo) throws IOException 
+    public Destination getDestination(EndpointInfo endpointInfo) 
+        throws IOException 
     {
-        XMPPConnection xmppConnection = new XMPPConnection(xmppServiceName);   
-
-        try
-        {
-            // Login to the XMMP server using the username and password from the configuration.
-            // The resource portion of the JID is the QName of the service.
-            xmppConnection.connect();
-            xmppConnection.login(
-                    xmppUsername, 
-                    xmppPassword, 
-                    endpointInfo.getName().toString());
-            System.out.println("Destination logged in as:"+xmppConnection.getUser());
-        }
-        catch (XMPPException xmppError)
-        {
-            throw new IOException(xmppError);
-        }
-        
+        // The resource portion of the JID is the QName of the service.
+        XMPPConnection xmppConnection = connectToXmpp(endpointInfo.getName().toString());
+        System.out.println("Destination logged in as:"+xmppConnection.getUser());
         return new XMPPDestination(xmppConnection, endpointInfo);
+    }
+
+    @Override
+    public Conduit getConduit(EndpointInfo endpointInfo) 
+        throws IOException
+    {
+        return getConduit(endpointInfo, endpointInfo.getTarget());
+    }
+
+    @Override
+    public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType endpointType)
+            throws IOException
+    {
+        XMPPConnection xmppConnection = connectToXmpp(endpointInfo.getName().toString());
+        System.out.println("Destination logged in as:"+xmppConnection.getUser());
+        return new XMPPClientConduit(endpointInfo, endpointType, xmppConnection);
     }    
     
     public void setXmppServiceName(String xmppServiceName)
@@ -102,4 +108,25 @@ public class XMPPTransportFactory extends AbstractTransportFactory implements De
     {
         this.xmppPassword = xmppPassword;
     }    
+    
+    private XMPPConnection connectToXmpp(String resourceName)
+        throws IOException
+    {
+        XMPPConnection xmppConnection = new XMPPConnection(xmppServiceName);   
+        
+        try
+        {
+            // Login to the XMMP server using the username and password from the configuration.
+            xmppConnection.connect();
+            xmppConnection.login(
+                    xmppUsername, 
+                    xmppPassword, 
+                    resourceName);
+        }
+        catch (XMPPException xmppError)
+        {
+            throw new IOException(xmppError);
+        }
+        return xmppConnection;
+    }        
 }
