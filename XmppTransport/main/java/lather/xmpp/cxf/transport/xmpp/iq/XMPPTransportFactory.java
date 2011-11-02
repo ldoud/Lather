@@ -8,7 +8,6 @@ import java.util.Set;
 
 import javax.annotation.Resource;
 
-import lather.smackx.soap.SoapPacket;
 import lather.smackx.soap.SoapProvider;
 
 import org.apache.cxf.Bus;
@@ -35,13 +34,10 @@ public class XMPPTransportFactory extends AbstractTransportFactory implements De
     
     private static final Set<String> URI_PREFIXES = new HashSet<String>();
     
-    // TODO Make these configurable.
-    private String serviceName = "localhost.localdomain";
-    private String username = "service1";
-    private String password = "service1";
-    
-    // The connection that is maintained by this feature.
-    private XMPPConnection xmppConnection = new XMPPConnection(serviceName);    
+    // Configuration options used to connect to XMPP server.
+    private String xmppServiceName;
+    private String xmppUsername;
+    private String xmppPassword;
     
     static 
     {
@@ -53,36 +49,11 @@ public class XMPPTransportFactory extends AbstractTransportFactory implements De
     {
         super(DEFAULT_NAMESPACES);
         
-        // Log into XMPP.
-        xmppConnection.connect();
-        xmppConnection.login(username, password);   
-        System.out.println("Logged in as:"+xmppConnection.getUser());
-        
         // TODO Remove this hack and properly configure this.
-        ProviderManager.getInstance().addIQProvider("Envelope", "http://www.w3.org/2003/05/soap-envelope", new SoapProvider());
-
-        for (Object provider : ProviderManager.getInstance().getIQProviders())
-        {
-            System.out.println("Provider: "+provider.getClass().getName());
-            if (provider instanceof Class)
-            {
-                try
-                {
-                    System.out.println("Underlying class: "+((Class)provider).newInstance().getClass().getName());
-                }
-                catch (InstantiationException e)
-                {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-                catch (IllegalAccessException e)
-                {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
-        }
-        
+        ProviderManager.getInstance().addIQProvider(
+                "Envelope", 
+                "http://www.w3.org/2003/05/soap-envelope", 
+                new SoapProvider());
     }
     
     @Resource(name = "cxf")
@@ -96,6 +67,39 @@ public class XMPPTransportFactory extends AbstractTransportFactory implements De
      */
     public Destination getDestination(EndpointInfo endpointInfo) throws IOException 
     {
+        XMPPConnection xmppConnection = new XMPPConnection(xmppServiceName);   
+
+        try
+        {
+            // Login to the XMMP server using the username and password from the configuration.
+            // The resource portion of the JID is the QName of the service.
+            xmppConnection.connect();
+            xmppConnection.login(
+                    xmppUsername, 
+                    xmppPassword, 
+                    endpointInfo.getName().toString());
+            System.out.println("Destination logged in as:"+xmppConnection.getUser());
+        }
+        catch (XMPPException xmppError)
+        {
+            throw new IOException(xmppError);
+        }
+        
         return new XMPPDestination(xmppConnection, endpointInfo);
+    }    
+    
+    public void setXmppServiceName(String xmppServiceName)
+    {
+        this.xmppServiceName = xmppServiceName;
+    }
+    
+    public void setXmppUsername(String xmppUsername)
+    {
+        this.xmppUsername = xmppUsername;
+    }
+    
+    public void setXmppPassword(String xmppPassword)
+    {
+        this.xmppPassword = xmppPassword;
     }    
 }

@@ -28,6 +28,9 @@
     
     <bean class="lather.xmpp.cxf.transport.xmpp.iq.XMPPTransportFactory">
     	<property name="bus" ref="cxf"/>
+    	<property name="xmppServiceName" value="localhost.localdomain"/>
+    	<property name="xmppUsername" value="service1"/>
+    	<property name="xmppPassword" value="service1"/>
     </bean>
 
 

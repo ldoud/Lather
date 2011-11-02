@@ -63,9 +63,8 @@ public class TestClient implements PacketListener
         });
         
         SoapPacket iqPacket = new SoapPacket();
-        iqPacket.setTo("service1@localhost.localdomain/Smack");
+        iqPacket.setTo("service1@localhost.localdomain/{http://service.xmpp.test/}HelloWorldServicePort");
         iqPacket.setEnvelope(message);
-//        iqPacket.setFrom("user1@localhost.localdomain");
         xmppConnection.sendPacket(iqPacket);
        
         System.out.println("Sent IQ Packet");
