@@ -9,7 +9,6 @@ import java.util.Hashtable;
 import lather.smackx.soap.SoapPacket;
 
 import org.apache.cxf.io.CachedOutputStream;
-import org.apache.cxf.io.CachedOutputStreamCallback;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
@@ -20,7 +19,6 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.PacketFilter;
-import org.jivesoftware.smack.packet.IQ;
 import org.jivesoftware.smack.packet.Packet;
 
 public class XMPPClientConduit 
@@ -60,23 +58,6 @@ public class XMPPClientConduit
                 return true;
             }
         });
-        
-        xmppConnection.addPacketSendingListener(new PacketListener() {
-            
-            @Override
-            public void processPacket(Packet arg0)
-            {
-                System.out.println("Sending packet: "+arg0.toXML());
-            }
-        }, new PacketFilter() {
-            
-            @Override
-            public boolean accept(Packet arg0)
-            {
-                // TODO Auto-generated method stub
-                return true;
-            }
-        });
     }
 
     @Override
@@ -103,10 +84,6 @@ public class XMPPClientConduit
     @Override
     public void close(Message msg) throws IOException
     {
-        // TODO Auto-generated method stub
-        // Clean up the resources used for message correlation.
-        System.out.println("closing time...");
-        
         // Take the contents of the cached buffer
         // and write them to the service using XMPP.
         CachedOutputStream output = (CachedOutputStream)msg.getContent(OutputStream.class);
@@ -124,8 +101,6 @@ public class XMPPClientConduit
             // TODO Target JID will have to become dynamic.
     //        String fullJid = targetJid + "/" + endpointInfo.getName().toString(); 
             String fullJid = "service1@localhost.localdomain/{http://service.xmpp.test/}HelloWorldServicePort";
-            System.out.println("Sending message: "+soapEnvelope.toString());
-            System.out.println("Sending to: "+fullJid);
             soapOverXmpp.setTo(fullJid);
             
             // Save the message so it can be used when the response is received.
@@ -156,10 +131,6 @@ public class XMPPClientConduit
     @Override
     public void processPacket(Packet xmppResponse)
     {
-        // When an XMPP message is received
-        // find the exchange that should receive it.
-        System.out.println("Response received: "+xmppResponse.toXML());
-               
         // TODO Is there a better input stream than ByteArrayInputStream?
         Message responseMsg = new MessageImpl();
         SoapPacket soapMsg = (SoapPacket)xmppResponse;

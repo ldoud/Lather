@@ -117,8 +117,6 @@ public class XMPPDestination implements Destination, PacketListener
     @Override
     public void processPacket(Packet msg)
     {
-       System.out.println("Packet received: "+msg.toXML());
-       
        SoapPacket soapMsg = (SoapPacket)msg;
        
        // TODO Is there a better input stream than ByteArrayInputStream?

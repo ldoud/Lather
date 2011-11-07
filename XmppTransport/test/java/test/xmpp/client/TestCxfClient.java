@@ -11,7 +11,17 @@ public class TestCxfClient
     {
         ApplicationContext context = new ClassPathXmlApplicationContext("client-iq-applicationContext.xml");
         HelloWorld client = (HelloWorld) context.getBean("helloClient");
-        String serviceResponse = client.sayHi("XMPP Service");
+        
+        
+        long startTime = System.currentTimeMillis();
+        String serviceResponse = client.sayHi("XMPP Service Call-1");
+        System.out.println("Elapsed time: "+(System.currentTimeMillis() - startTime));
         System.out.println("Service said: "+serviceResponse);
+        
+        startTime = System.currentTimeMillis();
+        serviceResponse = client.sayHi("XMPP Service Call-2");
+        System.out.println("Elapsed time: "+(System.currentTimeMillis() - startTime));
+        System.out.println("Service said: "+serviceResponse);       
+        
     }
 }

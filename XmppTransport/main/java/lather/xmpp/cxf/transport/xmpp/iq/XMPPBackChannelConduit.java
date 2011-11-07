@@ -13,7 +13,6 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.IQ;
-import org.jivesoftware.smack.packet.IQ.Type;
 
 public class XMPPBackChannelConduit implements Conduit
 {
@@ -57,7 +56,6 @@ public class XMPPBackChannelConduit implements Conduit
         CachedOutputStream soapResponse = (CachedOutputStream)msg.getContent(OutputStream.class);
         StringBuilder replyMsg = new StringBuilder();
         soapResponse.writeCacheTo(replyMsg);
-        
        
         SoapPacket responseIQ = new SoapPacket();
         responseIQ.setType(IQ.Type.RESULT);
@@ -65,7 +63,6 @@ public class XMPPBackChannelConduit implements Conduit
         responseIQ.setFrom(soapMsg.getTo());
         responseIQ.setTo(soapMsg.getFrom());
         responseIQ.setEnvelope(replyMsg.toString());
-        System.out.println("Sending response: "+responseIQ.toXML());
         
         connection.sendPacket(responseIQ);
     }
