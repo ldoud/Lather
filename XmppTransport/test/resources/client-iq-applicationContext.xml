@@ -37,7 +37,7 @@
 	    <jaxws:client id="helloClient"
                   serviceClass="test.xmpp.service.HelloWorld"
                   transportId="http://cxf.apache.org/transports/xmpp"
-                  address="xmpp:" />
+                  address="{http://service.xmpp.test/}HelloWorldServicePort" />
 	
 
 

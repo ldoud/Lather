@@ -14,6 +14,11 @@ import org.apache.cxf.wsdl.EndpointReferenceUtils;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.packet.IQ;
 
+/**
+ * This is used by the service to reply to the client.
+ * @author Leon Doud
+ *
+ */
 public class XMPPBackChannelConduit implements Conduit
 {
     private MessageObserver msgObserver = null;

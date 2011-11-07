@@ -99,8 +99,8 @@ public class XMPPClientConduit
             soapOverXmpp.setEnvelope(soapEnvelope.toString());
             
             // TODO Target JID will have to become dynamic.
-    //        String fullJid = targetJid + "/" + endpointInfo.getName().toString(); 
-            String fullJid = "service1@localhost.localdomain/{http://service.xmpp.test/}HelloWorldServicePort";
+            String fullJid = targetJid + "/" + getTarget().getAddress().getValue();
+//            String fullJid = "service1@localhost.localdomain/{http://service.xmpp.test/}HelloWorldServicePort";
             soapOverXmpp.setTo(fullJid);
             
             // Save the message so it can be used when the response is received.
