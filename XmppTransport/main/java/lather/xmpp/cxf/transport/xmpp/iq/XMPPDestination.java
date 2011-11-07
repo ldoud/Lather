@@ -130,6 +130,7 @@ public class XMPPDestination implements Destination, PacketListener
        msgExchange.setConduit(new XMPPBackChannelConduit(soapMsg, xmppConnection));
        cxfMsg.setExchange(msgExchange);
        
+       // TODO Fix this so a different thread is used.
        msgObserver.onMessage(cxfMsg);       
         
     }

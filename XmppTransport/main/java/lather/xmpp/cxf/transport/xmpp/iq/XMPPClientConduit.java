@@ -50,11 +50,9 @@ public class XMPPClientConduit
         this.target = target;
         this.xmppConnection = xmppConnection;
         xmppConnection.addPacketListener(this, new PacketFilter() {
-            
             @Override
-            public boolean accept(Packet arg0)
+            public boolean accept(Packet xmppPacket)
             {
-                // TODO Auto-generated method stub
                 return true;
             }
         });
@@ -99,8 +97,9 @@ public class XMPPClientConduit
             soapOverXmpp.setEnvelope(soapEnvelope.toString());
             
             // TODO Target JID will have to become dynamic.
+            // Maybe the target addressed is used to search, 
+            // but it doesn't end up being part of the full JID.
             String fullJid = targetJid + "/" + getTarget().getAddress().getValue();
-//            String fullJid = "service1@localhost.localdomain/{http://service.xmpp.test/}HelloWorldServicePort";
             soapOverXmpp.setTo(fullJid);
             
             // Save the message so it can be used when the response is received.
@@ -139,9 +138,11 @@ public class XMPPClientConduit
                 new ByteArrayInputStream(soapMsg.getChildElementXML().getBytes())
         );        
       
+        // TODO Fix this to handle error replies from XMPP server.
         Exchange msgExchange = exchangeCorrelationTable.remove(xmppResponse.getPacketID());
         msgExchange.setInMessage(responseMsg);
 
+        // TODO Fix this so the response is processed by a different thread.
         msgObserver.onMessage(responseMsg);
     }
 
