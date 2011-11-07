@@ -1,13 +1,18 @@
 package lather.xmpp.cxf.transport.xmpp.iq;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.Hashtable;
 
 import lather.smackx.soap.SoapPacket;
 
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.io.CachedOutputStreamCallback;
+import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
+import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
@@ -27,11 +32,16 @@ public class XMPPClientConduit
     // After messages are received they are passed to this observer.
     private MessageObserver msgObserver;    
     
+    // How to deliver the message to the service.
     private XMPPConnection xmppConnection;
     
+    // Information about service being called.
     private EndpointInfo endpointInfo;
-    
     private EndpointReferenceType target;
+    
+    // Messages sent to the service are stored in this table based on 
+    // their PacketId so they can be retrieved when a response is received.
+    private Hashtable<String, Exchange> exchangeCorrelationTable = new Hashtable<String, Exchange>();
     
     public XMPPClientConduit(
             EndpointInfo endpointInfo, 
@@ -42,6 +52,23 @@ public class XMPPClientConduit
         this.target = target;
         this.xmppConnection = xmppConnection;
         xmppConnection.addPacketListener(this, new PacketFilter() {
+            
+            @Override
+            public boolean accept(Packet arg0)
+            {
+                // TODO Auto-generated method stub
+                return true;
+            }
+        });
+        
+        xmppConnection.addPacketSendingListener(new PacketListener() {
+            
+            @Override
+            public void processPacket(Packet arg0)
+            {
+                System.out.println("Sending packet: "+arg0.toXML());
+            }
+        }, new PacketFilter() {
             
             @Override
             public boolean accept(Packet arg0)
@@ -83,24 +110,30 @@ public class XMPPClientConduit
         // Take the contents of the cached buffer
         // and write them to the service using XMPP.
         CachedOutputStream output = (CachedOutputStream)msg.getContent(OutputStream.class);
-        StringBuilder soapEnvelope = new StringBuilder();
-        output.writeCacheTo(soapEnvelope);
         
-        SoapPacket soapOverXmpp = new SoapPacket();
-        soapOverXmpp.setEnvelope(soapEnvelope.toString());
-        
-//        soapOverXmpp.setPacketID(soapMsg.getPacketID());
-//        soapOverXmpp.setFrom(soapMsg.getTo());
-//        soapOverXmpp.setTo(soapMsg.getFrom());
-        
-        // TODO Target JID will have to become dynamic.
-//        String fullJid = targetJid + "/" + endpointInfo.getName().toString(); 
-        String fullJid = "service1@localhost.localdomain/{http://service.xmpp.test/}HelloWorldServicePort";
-        System.out.println("Sending message: "+soapEnvelope.toString());
-        System.out.println("Sending to: "+fullJid);
-        soapOverXmpp.setTo(fullJid);
-        
-        xmppConnection.sendPacket(soapOverXmpp);   
+        // Null indicates this message represents the reply from the service.
+        // This means that the request was already sent to the service and a response was received.
+        if(output != null)
+        {
+            StringBuilder soapEnvelope = new StringBuilder();
+            output.writeCacheTo(soapEnvelope);
+            
+            SoapPacket soapOverXmpp = new SoapPacket();
+            soapOverXmpp.setEnvelope(soapEnvelope.toString());
+            
+            // TODO Target JID will have to become dynamic.
+    //        String fullJid = targetJid + "/" + endpointInfo.getName().toString(); 
+            String fullJid = "service1@localhost.localdomain/{http://service.xmpp.test/}HelloWorldServicePort";
+            System.out.println("Sending message: "+soapEnvelope.toString());
+            System.out.println("Sending to: "+fullJid);
+            soapOverXmpp.setTo(fullJid);
+            
+            // Save the message so it can be used when the response is received.
+            exchangeCorrelationTable.put(soapOverXmpp.getPacketID(), msg.getExchange());
+            
+            // Send the message to the service.
+            xmppConnection.sendPacket(soapOverXmpp); 
+        }
     }
 
     @Override
@@ -121,11 +154,24 @@ public class XMPPClientConduit
      * Responses will need to be correlated with their requests.
      */
     @Override
-    public void processPacket(Packet responseMsg)
+    public void processPacket(Packet xmppResponse)
     {
         // When an XMPP message is received
         // find the exchange that should receive it.
-        System.out.println("Response received: "+responseMsg.toXML());
+        System.out.println("Response received: "+xmppResponse.toXML());
+               
+        // TODO Is there a better input stream than ByteArrayInputStream?
+        Message responseMsg = new MessageImpl();
+        SoapPacket soapMsg = (SoapPacket)xmppResponse;
+        responseMsg.setContent(
+                InputStream.class, 
+                new ByteArrayInputStream(soapMsg.getChildElementXML().getBytes())
+        );        
+      
+        Exchange msgExchange = exchangeCorrelationTable.remove(xmppResponse.getPacketID());
+        msgExchange.setInMessage(responseMsg);
+
+        msgObserver.onMessage(responseMsg);
     }
 
 }

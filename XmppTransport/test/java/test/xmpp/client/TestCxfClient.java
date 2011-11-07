@@ -11,7 +11,7 @@ public class TestCxfClient
     {
         ApplicationContext context = new ClassPathXmlApplicationContext("client-iq-applicationContext.xml");
         HelloWorld client = (HelloWorld) context.getBean("helloClient");
-        client.sayHi("Fred");
-
+        String serviceResponse = client.sayHi("XMPP Service");
+        System.out.println("Service said: "+serviceResponse);
     }
 }

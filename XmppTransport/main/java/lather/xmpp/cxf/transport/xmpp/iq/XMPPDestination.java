@@ -121,6 +121,7 @@ public class XMPPDestination implements Destination, PacketListener
        
        SoapPacket soapMsg = (SoapPacket)msg;
        
+       // TODO Is there a better input stream than ByteArrayInputStream?
        Message cxfMsg = new MessageImpl();
        cxfMsg.setContent(
                InputStream.class, 

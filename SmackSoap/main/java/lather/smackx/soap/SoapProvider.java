@@ -25,6 +25,12 @@ public class SoapProvider implements IQProvider
             {
                 endOfSoapMsg = true;
             }
+            else if ("Envelope".equals(parser.getName()) && 
+                    "http://schemas.xmlsoap.org/soap/envelope/".equals(parser.getNamespace()) && 
+                     parser.getEventType() == XmlPullParser.END_TAG)
+            {
+                endOfSoapMsg = true;
+            }            
             // Otherwise keep parsing.
             else
             {
