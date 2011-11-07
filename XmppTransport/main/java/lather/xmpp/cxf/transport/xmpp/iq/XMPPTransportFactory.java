@@ -38,6 +38,7 @@ public class XMPPTransportFactory extends AbstractTransportFactory
     public static final List<String> DEFAULT_NAMESPACES = Arrays.asList(
         "http://cxf.apache.org/transports/xmpp");
     
+    // TODO Don't think this or the static initializer is necessary.
     private static final Set<String> URI_PREFIXES = new HashSet<String>();
     
     // Configuration options used to connect to XMPP server.

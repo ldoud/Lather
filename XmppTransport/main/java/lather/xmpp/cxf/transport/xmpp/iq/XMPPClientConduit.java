@@ -139,6 +139,7 @@ public class XMPPClientConduit
         );        
       
         // TODO Fix this to handle error replies from XMPP server.
+        // TODO Fix this to handle exhanges that don't exist.
         Exchange msgExchange = exchangeCorrelationTable.remove(xmppResponse.getPacketID());
         msgExchange.setInMessage(responseMsg);
 
