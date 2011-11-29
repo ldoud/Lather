@@ -12,7 +12,6 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -23,10 +22,7 @@ import org.jivesoftware.smack.packet.Packet;
 
 public class XMPPClientConduit 
     implements Conduit, PacketListener
-{
-    // TODO This needs to be dynamic and/or configurable.
-    private String targetJid = "service1@localhost.localdomain";
-    
+{    
     // After messages are received they are passed to this observer.
     private MessageObserver msgObserver;    
     
@@ -34,7 +30,6 @@ public class XMPPClientConduit
     private XMPPConnection xmppConnection;
     
     // Information about service being called.
-    private EndpointInfo endpointInfo;
     private EndpointReferenceType target;
     
     // Messages sent to the service are stored in this table based on 
@@ -42,11 +37,9 @@ public class XMPPClientConduit
     private Hashtable<String, Exchange> exchangeCorrelationTable = new Hashtable<String, Exchange>();
     
     public XMPPClientConduit(
-            EndpointInfo endpointInfo, 
             EndpointReferenceType target, 
             XMPPConnection xmppConnection)
     {
-        this.endpointInfo = endpointInfo;
         this.target = target;
         this.xmppConnection = xmppConnection;
         xmppConnection.addPacketListener(this, new PacketFilter() {
@@ -97,9 +90,10 @@ public class XMPPClientConduit
             soapOverXmpp.setEnvelope(soapEnvelope.toString());
             
             // TODO Target JID will have to become dynamic.
-            // Maybe the target addressed is used to search, 
-            // but it doesn't end up being part of the full JID.
-            String fullJid = targetJid + "/" + getTarget().getAddress().getValue();
+            // Pass "getTarget().getAddress().getValue()" to the 
+            // discovery implementation class and have it return
+            // the dynamic endpoint address as a full JID.
+            String fullJid = getTarget().getAddress().getValue();
             soapOverXmpp.setTo(fullJid);
             
             // Save the message so it can be used when the response is received.
@@ -139,7 +133,7 @@ public class XMPPClientConduit
         );        
       
         // TODO Fix this to handle error replies from XMPP server.
-        // TODO Fix this to handle exhanges that don't exist.
+        // TODO Fix this to handle exchanges that don't exist.
         Exchange msgExchange = exchangeCorrelationTable.remove(xmppResponse.getPacketID());
         msgExchange.setInMessage(responseMsg);
 

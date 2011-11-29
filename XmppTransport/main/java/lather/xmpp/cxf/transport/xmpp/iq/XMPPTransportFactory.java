@@ -124,7 +124,7 @@ public class XMPPTransportFactory extends AbstractTransportFactory
                 bus.setProperty(CLIENT_CONDUIT_XMPP_CONNECTION, connection);
             }
             
-            return new XMPPClientConduit(endpointInfo, endpointType, connection);
+            return new XMPPClientConduit(endpointType, connection);
         }
     }    
     
