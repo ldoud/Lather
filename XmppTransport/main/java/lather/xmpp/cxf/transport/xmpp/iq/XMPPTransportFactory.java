@@ -33,7 +33,7 @@ import org.jivesoftware.smack.provider.ProviderManager;
 public class XMPPTransportFactory extends AbstractTransportFactory 
     implements DestinationFactory, ConduitInitiator
 {
-    private static final String CLIENT_CONDUIT_XMPP_CONNECTION = "xmpp.transport.client_conduit_connection";
+    private static final String BUS_CONDUIT_XMPP_CONNECTION = "xmpp.transport.bus_conduit_connection";
 
     public static final List<String> DEFAULT_NAMESPACES = Arrays.asList(
         "http://cxf.apache.org/transports/xmpp");
@@ -42,6 +42,16 @@ public class XMPPTransportFactory extends AbstractTransportFactory
     private String xmppServiceName;
     private String xmppUsername;
     private String xmppPassword;
+    
+    public static void storeConnection(Bus bus, XMPPConnection connection)
+    {
+        bus.setProperty(BUS_CONDUIT_XMPP_CONNECTION, connection);
+    }
+    
+    public static XMPPConnection getConnection(Bus bus)
+    {
+        return (XMPPConnection)bus.getProperty(BUS_CONDUIT_XMPP_CONNECTION);
+    }
     
     public XMPPTransportFactory() throws XMPPException
     {
@@ -98,24 +108,21 @@ public class XMPPTransportFactory extends AbstractTransportFactory
     public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType endpointType)
             throws IOException
     {
-        Bus bus = getBus();
+        XMPPClientConduit conduit = new XMPPClientConduit(endpointType);
         
-        // Synchronize in case initialization is necessary.
-        synchronized (bus)
+        // If there is common share connection in the bus 
+        // then setup the conduit to use it.
+        Bus bus = getBus();
+        XMPPConnection connection = XMPPTransportFactory.getConnection(bus);
+        
+        // A null connection indicates a connection feature will
+        // later configure the conduit with a connection.
+        if (connection != null)
         {
-            // All clients share their XMPP connection via the bus.
-            XMPPConnection connection = 
-                (XMPPConnection)bus.getProperty(CLIENT_CONDUIT_XMPP_CONNECTION);
-            
-            // Initialize if necessary.
-            if (connection == null || !connection.isConnected())
-            {
-                connection = connectToXmpp(bus.getId()+"-client");
-                bus.setProperty(CLIENT_CONDUIT_XMPP_CONNECTION, connection);
-            }
-            
-            return new XMPPClientConduit(endpointType, connection);
+            conduit.setConnection(connection);
         }
+        
+        return conduit;
     }    
     
     /**

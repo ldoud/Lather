@@ -36,19 +36,21 @@ public class XMPPClientConduit
     // their PacketId so they can be retrieved when a response is received.
     private Hashtable<String, Exchange> exchangeCorrelationTable = new Hashtable<String, Exchange>();
     
-    public XMPPClientConduit(
-            EndpointReferenceType target, 
-            XMPPConnection xmppConnection)
+    public XMPPClientConduit(EndpointReferenceType target)
     {
         this.target = target;
-        this.xmppConnection = xmppConnection;
+    }
+    
+    public void setConnection(XMPPConnection connection)
+    {
+        xmppConnection = connection;
         xmppConnection.addPacketListener(this, new PacketFilter() {
             @Override
             public boolean accept(Packet xmppPacket)
             {
                 return true;
             }
-        });
+        });       
     }
 
     @Override
