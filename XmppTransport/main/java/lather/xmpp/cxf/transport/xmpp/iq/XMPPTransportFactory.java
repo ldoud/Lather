@@ -2,9 +2,7 @@ package lather.xmpp.cxf.transport.xmpp.iq;
 
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.annotation.Resource;
 
@@ -25,8 +23,10 @@ import org.jivesoftware.smack.provider.ProviderManager;
 /**
  * Creates both XMPP destinations for servers and conduits for clients.
  * 
- * Web service providers that use one of the XMPP URI prefixes will  
- * trigger the use of this factory for creation of XMPPDestination.
+ * Web service providers or web service clients that use the 
+ * XMPP transport namespace of "http://cxf.apache.org/transports/xmpp"
+ * as their transport ID will trigger the use of this factory for 
+ * the creation of XMPPDestination (provider) or XMPPClientConduit (client).
  * 
  * @author Leon Doud
  */
@@ -38,19 +38,10 @@ public class XMPPTransportFactory extends AbstractTransportFactory
     public static final List<String> DEFAULT_NAMESPACES = Arrays.asList(
         "http://cxf.apache.org/transports/xmpp");
     
-    // TODO Don't think this or the static initializer is necessary.
-    private static final Set<String> URI_PREFIXES = new HashSet<String>();
-    
     // Configuration options used to connect to XMPP server.
     private String xmppServiceName;
     private String xmppUsername;
     private String xmppPassword;
-    
-    static 
-    {
-        URI_PREFIXES.add("xmpp://");
-        URI_PREFIXES.add("xmpp:");
-    }  
     
     public XMPPTransportFactory() throws XMPPException
     {
@@ -58,7 +49,6 @@ public class XMPPTransportFactory extends AbstractTransportFactory
         
         SoapProvider xmppSoapFeature = new SoapProvider();
         
-        // TODO Remove this hack and properly configure this.
         ProviderManager.getInstance().addIQProvider(
                 "Envelope", 
                 "http://www.w3.org/2003/05/soap-envelope", 
