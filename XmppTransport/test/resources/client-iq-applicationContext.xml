@@ -36,9 +36,6 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd"
     
     <bean class="lather.xmpp.cxf.transport.xmpp.iq.XMPPTransportFactory">
     	<property name="bus" ref="cxf"/>
-    	<property name="xmppServiceName" value="localhost.localdomain"/>
-    	<property name="xmppUsername" value="user1"/>
-    	<property name="xmppPassword" value="user1"/>
     </bean>
     
 	<jaxws:client id="helloClient"

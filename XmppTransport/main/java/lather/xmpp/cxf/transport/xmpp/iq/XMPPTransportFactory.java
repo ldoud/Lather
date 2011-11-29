@@ -38,11 +38,6 @@ public class XMPPTransportFactory extends AbstractTransportFactory
     public static final List<String> DEFAULT_NAMESPACES = Arrays.asList(
         "http://cxf.apache.org/transports/xmpp");
     
-    // Configuration options used to connect to XMPP server.
-    private String xmppServiceName;
-    private String xmppUsername;
-    private String xmppPassword;
-    
     public static void storeConnection(Bus bus, XMPPConnection connection)
     {
         bus.setProperty(BUS_CONDUIT_XMPP_CONNECTION, connection);
@@ -83,10 +78,9 @@ public class XMPPTransportFactory extends AbstractTransportFactory
      */
     public Destination getDestination(EndpointInfo endpointInfo) 
         throws IOException 
-    {
-        // The resource portion of the JID is the QName of the service.
-        XMPPConnection xmppConnection = connectToXmpp(endpointInfo.getName().toString());
-        return new XMPPDestination(xmppConnection, endpointInfo);
+    {        
+        // Connection feature will configure the XMPP connection later.
+        return new XMPPDestination(endpointInfo);
     }
     
     /**
@@ -124,61 +118,5 @@ public class XMPPTransportFactory extends AbstractTransportFactory
         
         return conduit;
     }    
-    
-    /**
-     * Required configuration option for connecting to the XMPP server.
-     * @param xmppServiceName The full name of the XMPP server.
-     */
-    public void setXmppServiceName(String xmppServiceName)
-    {
-        this.xmppServiceName = xmppServiceName;
-    }
-    
-    /**
-     * Required configuration option for connecting to the XMPP server.
-     * @param xmppUsername The username for the XMPP connection.
-     */
-    public void setXmppUsername(String xmppUsername)
-    {
-        this.xmppUsername = xmppUsername;
-    }
-    
-    /**
-     * Required configuration option for connecting to the XMPP server.
-     * @param xmppPassword The password for the XMPP connection.
-     */
-    public void setXmppPassword(String xmppPassword)
-    {
-        this.xmppPassword = xmppPassword;
-    }    
-    
-    /**
-     * Creates an XMPP connection to be use by one destination or conduit.
-     * 
-     * @param resourceName This is the last portion of a full JID.
-     * @return The XMPP connection to be used by a destination or conduit.
-     * @throws IOException If the XMPP error occurs during login.
-     */
-    private XMPPConnection connectToXmpp(String resourceName)
-        throws IOException
-    {
-        XMPPConnection xmppConnection = new XMPPConnection(xmppServiceName);   
-        
-        try
-        {
-            // Login to the XMMP server using the username 
-            // and password from the configuration.
-            xmppConnection.connect();
-            xmppConnection.login(
-                    xmppUsername, 
-                    xmppPassword, 
-                    resourceName);
-        }
-        catch (XMPPException xmppError)
-        {
-            throw new IOException(xmppError);
-        }
-        
-        return xmppConnection;
-    }        
+ 
 }

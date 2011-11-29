@@ -39,24 +39,24 @@ public class XMPPDestination implements Destination, PacketListener
     // After messages are received they are passed to this observer.
     private MessageObserver msgObserver = null;
     
-    public XMPPDestination(XMPPConnection xmppConnection, EndpointInfo epInfo)
+    public XMPPDestination(EndpointInfo epInfo)
     {
-        this.xmppConnection = xmppConnection;
-        
         // Initialize the address of the epRefType member.
         AttributedURIType address = new AttributedURIType();
         address.setValue(epInfo.getAddress());
         epRefType.setAddress(address);
-     
+    }
+    
+    public void setConnection(XMPPConnection xmppConnection)
+    {
+        this.xmppConnection = xmppConnection;
         xmppConnection.addPacketListener(this, new PacketFilter() {            
             @Override
-            public boolean accept(Packet arg0)
+            public boolean accept(Packet anyPacket)
             {
-                // TODO Auto-generated method stub
                 return true;
             }
-        });
-        
+        });        
     }
     
     /**
@@ -111,7 +111,10 @@ public class XMPPDestination implements Destination, PacketListener
     @Override
     public void shutdown()
     {
-       xmppConnection.disconnect();
+       if (xmppConnection != null)
+       {
+           xmppConnection.disconnect();
+       }
     }
 
     @Override

@@ -10,6 +10,7 @@ import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.transport.Conduit;
+import org.apache.cxf.transport.Destination;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
@@ -36,7 +37,23 @@ public class BasicConnectionFeature extends AbstractFeature
     @Override
     public void initialize(Server server, Bus bus)
     {
-        System.out.println("Initializing server");
+        Destination destination = server.getDestination();
+        if (destination instanceof XMPPDestination)
+        {
+            XMPPDestination xmppDestination = (XMPPDestination)destination;
+            
+            // The XMPP requires a username and a resource name.
+            // Use the QName of the service as the XMPP resource name.
+            XMPPConnection connection = connectToXmpp(
+                server.getEndpoint().getEndpointInfo().getName().toString());
+            xmppDestination.setConnection(connection);
+        }
+        else
+        {
+            LOGGER.log(
+                Level.WARNING, 
+                "XMPP connection configured for non-XMPP destination");
+        }
     }
     
     @Override
