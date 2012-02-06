@@ -26,7 +26,7 @@
 
     <cxf:bus bus="cxf"/>
     
-    <bean class="lather.xmpp.cxf.transport.xmpp.iq.XMPPTransportFactory">
+    <bean class="org.apache.cxf.transport.xmpp.iq.XMPPTransportFactory">
     	<property name="bus" ref="cxf"/>
     </bean>
 
@@ -35,7 +35,7 @@
 		transportId="http://cxf.apache.org/transports/xmpp"
 		implementor="test.xmpp.service.HelloWorldService">
 		<jaxws:features>
-			<bean class="lather.xmpp.cxf.transport.xmpp.iq.BasicConnectionFeature">
+			<bean class="org.apache.cxf.transport.xmpp.iq.BasicConnectionFeature">
 		    	<property name="xmppServiceName" value="localhost.localdomain"/>
 		    	<property name="xmppUsername" value="service1"/>
 		    	<property name="xmppPassword" value="service1"/>			

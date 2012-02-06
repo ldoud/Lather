@@ -30,7 +30,7 @@
 
     <cxf:bus bus="cxf"/>
     
-    <bean class="lather.xmpp.cxf.transport.xmpp.chat.XMPPTransportFactory">
+    <bean class="org.apache.cxf.transport.xmpp.chat.XMPPTransportFactory">
     	<property name="bus" ref="cxf"/>
     </bean>
 

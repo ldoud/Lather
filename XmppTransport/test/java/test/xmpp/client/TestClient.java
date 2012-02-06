@@ -1,8 +1,8 @@
 package test.xmpp.client;
 
-import lather.smackx.soap.SoapPacket;
-import lather.smackx.soap.SoapProvider;
 
+import org.apache.cxf.transport.xmpp.smackx.soap.SoapPacket;
+import org.apache.cxf.transport.xmpp.smackx.soap.SoapProvider;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.PacketFilter;
