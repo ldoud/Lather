@@ -1,3 +1,22 @@
+/**
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements. See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership. The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License. You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied. See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+
 package test.xmpp.client;
 
 import org.springframework.context.ApplicationContext;
@@ -5,23 +24,20 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import test.xmpp.service.HelloWorld;
 
-public class TestCxfClient
-{
-    public static void main(String[] args)
-    {
+public class TestCxfClient {
+    public static void main(String[] args) {
         ApplicationContext context = new ClassPathXmlApplicationContext("client-iq-applicationContext.xml");
-        HelloWorld client = (HelloWorld) context.getBean("helloClient");
-        
-        
+        HelloWorld client = (HelloWorld)context.getBean("helloClient");
+
         long startTime = System.currentTimeMillis();
         String serviceResponse = client.sayHi("XMPP Service Call-1");
-        System.out.println("Elapsed time: "+(System.currentTimeMillis() - startTime));
-        System.out.println("Service said: "+serviceResponse);
-        
+        System.out.println("Elapsed time: " + (System.currentTimeMillis() - startTime));
+        System.out.println("Service said: " + serviceResponse);
+
         startTime = System.currentTimeMillis();
         serviceResponse = client.sayHi("XMPP Service Call-2");
-        System.out.println("Elapsed time: "+(System.currentTimeMillis() - startTime));
-        System.out.println("Service said: "+serviceResponse);       
-        
+        System.out.println("Elapsed time: " + (System.currentTimeMillis() - startTime));
+        System.out.println("Service said: " + serviceResponse);
+
     }
 }
