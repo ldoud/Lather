@@ -23,6 +23,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.AbstractMap;
 import java.util.HashMap;
 
 import org.apache.cxf.io.CachedOutputStream;
@@ -50,7 +51,7 @@ public class XMPPClientConduit implements Conduit, PacketListener {
 
     // Messages sent to the service are stored in this table based on
     // their PacketId so they can be retrieved when a response is received.
-    private HashMap<String, Exchange> exchangeCorrelationTable = new HashMap<String, Exchange>();
+    private AbstractMap<String, Exchange> exchangeCorrelationTable = new HashMap<String, Exchange>();
 
     public XMPPClientConduit(EndpointReferenceType target) {
         this.target = target;
