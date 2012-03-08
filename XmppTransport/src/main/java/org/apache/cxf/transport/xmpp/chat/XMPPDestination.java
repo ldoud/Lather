@@ -53,14 +53,16 @@ public class XMPPDestination implements Destination {
     // After messages are received they are passed to this observer.
     private MessageObserver msgObserver;
 
-    public XMPPDestination(XMPPConnection xmppConnection, EndpointInfo epInfo) {
-        this.xmppConnection = xmppConnection;
-
+    public XMPPDestination(EndpointInfo epInfo) {
         // Initialize the address of the epRefType member.
         AttributedURIType address = new AttributedURIType();
         address.setValue(epInfo.getAddress());
         epRefType.setAddress(address);
-
+    }
+    
+    public void setConnection(XMPPConnection xmppConnection) {
+        this.xmppConnection = xmppConnection;
+        
         // Receive SOAP via chat.
         xmppConnection.getChatManager().addChatListener(new ChatManagerListener() {
             @Override
@@ -86,7 +88,6 @@ public class XMPPDestination implements Destination {
 
             }
         });
-
     }
 
     /**

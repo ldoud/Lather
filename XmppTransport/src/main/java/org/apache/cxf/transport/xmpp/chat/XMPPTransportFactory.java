@@ -77,6 +77,8 @@ public class XMPPTransportFactory extends AbstractTransportFactory implements De
      * {@inheritDoc}
      */
     public Destination getDestination(EndpointInfo endpointInfo) throws IOException {
-        return new XMPPDestination(xmppConnection, endpointInfo);
+        XMPPDestination dest = new XMPPDestination(endpointInfo);
+        dest.setConnection(xmppConnection);
+        return dest;
     }
 }
