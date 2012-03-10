@@ -56,7 +56,7 @@
        </amq:plugins>
 
         <amq:transportConnectors>
-            <amq:transportConnector name="xmpp" uri="xmpp://0.0.0.0:61616"/>
+            <amq:transportConnector name="xmpp" uri="xmpp://0.0.0.0:61222"/>
         </amq:transportConnectors>
 
     </amq:broker>
