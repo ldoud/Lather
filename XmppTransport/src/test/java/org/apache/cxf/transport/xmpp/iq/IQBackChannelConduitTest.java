@@ -18,12 +18,15 @@
  */
 package org.apache.cxf.transport.xmpp.iq;
 
+import org.junit.Before;
 import org.junit.Test;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class IQBackChannelConduitTest {
     
+    @Before
     public void setupXmppServer() {
-        
+        new ClassPathXmlApplicationContext("xmpp-embedded-broker.xml");
     }
     
     @Test

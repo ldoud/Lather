@@ -95,7 +95,7 @@
         </dependency>
 
 
-<!-- 
+<!-- -->
         <dependency>
             <groupId>org.apache.geronimo.specs</groupId>
             <artifactId>geronimo-j2ee-management_1.1_spec</artifactId>
@@ -133,7 +133,7 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-tx</artifactId>
         </dependency>
- -->
+ 
  
         <dependency>
             <groupId>com.sun.xml.bind</groupId>
@@ -159,7 +159,7 @@
         </dependency>        
     </dependencies>
 
-<!--  
+<!--  -->
     <build>
         <plugins>
             <plugin>
@@ -215,9 +215,9 @@
             </plugin>
         </plugins>
     </build>
--->
 
-<!-- 
+
+<!-- -->
     <profiles>
         <profile>
             <id>jdk15</id>
@@ -237,5 +237,5 @@
             </dependencies>
         </profile>
     </profiles>
- -->
+
 </project>

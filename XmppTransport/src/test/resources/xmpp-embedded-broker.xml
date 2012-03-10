@@ -47,9 +47,16 @@
         </simpleAuthenticationPlugin>
       </plugins>
        -->
+       <amq:plugins>
+       	<amq:simpleAuthenticationPlugin>
+       		<amq:users>
+       			<amq:authenticationUser username="user1" password="user1" groups="users,admins"/>
+       		</amq:users>
+       	</amq:simpleAuthenticationPlugin>
+       </amq:plugins>
 
         <amq:transportConnectors>
-            <amq:transportConnector name="openwire" uri="tcp://0.0.0.0:61616"/>
+            <amq:transportConnector name="xmpp" uri="xmpp://0.0.0.0:61616"/>
         </amq:transportConnectors>
 
     </amq:broker>
