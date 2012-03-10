@@ -60,8 +60,8 @@ public class XMPPDestination implements Destination {
         epRefType.setAddress(address);
     }
     
-    public void setConnection(XMPPConnection xmppConnection) {
-        this.xmppConnection = xmppConnection;
+    public void setConnection(XMPPConnection newConnection) {
+        xmppConnection = newConnection;
         
         // Receive SOAP via chat.
         xmppConnection.getChatManager().addChatListener(new ChatManagerListener() {
