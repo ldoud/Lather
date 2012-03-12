@@ -140,7 +140,6 @@ public class IQDestination implements Destination, PacketListener {
 
         // TODO Fix this so a different thread is used.
         msgObserver.onMessage(cxfMsg);
-
     }
 
 }
