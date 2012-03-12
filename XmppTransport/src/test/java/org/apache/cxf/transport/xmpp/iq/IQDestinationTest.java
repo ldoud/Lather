@@ -158,9 +158,6 @@ public class IQDestinationTest {
             Assert.fail("Could not convert message content to a String");
         }
 
-        // ByteArrayInputStream msgAsBytes = new ByteArrayInputStream(xmlMsg.getBytes());
-        // Assert.assertEquals("Message content is correct", msgAsBytes, stream);
-
         Exchange exchange = testMsg.getExchange();
         Assert.assertNotNull("Message has an exchange", exchange);
 
