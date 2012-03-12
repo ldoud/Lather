@@ -18,23 +18,72 @@
  */
 package org.apache.cxf.transport.xmpp.iq;
 
+import junit.framework.Assert;
+
+import org.apache.cxf.message.Message;
+import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.xmpp.smackx.soap.SoapPacket;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.packet.Packet;
 import org.junit.Before;
 import org.junit.Test;
 
 public class IQBackChannelConduitTest {
-
-    private XmppTestServer xmppServer = new XmppTestServer();
+    
+    // Test stubs for a SOAP packet.
+//    private static final String REPLY_MSG = "<something>that does not matter</something>";
+    private SoapPacket testInputPacket;
+    
+    // Test stubs for an XMPP connections.
+//    private Packet testReplyPacket;
+    private boolean testDisconnectedWasCalled;
+    private XMPPConnection fakeXmppConnection;
 
     @Before
-    public void setupXmppServer() {
-        xmppServer.startActiveMQ();
+    public void initializeTestStubs() {
+        testInputPacket = new SoapPacket();
+        
+        testDisconnectedWasCalled = false;
+        fakeXmppConnection = new XMPPConnection("doesNotMatter") {
+            
+            @Override
+            public void disconnect() {
+                testDisconnectedWasCalled = true;
+            }
+            
+            @Override
+            public void sendPacket(Packet packet) {
+//                testReplyPacket = packet;
+            };
+        };
+    }
+    
+    @Test
+    public void testMsgObserverIsSet() {
+        MessageObserver obs = new MessageObserver() {
+            @Override
+            public void onMessage(Message arg0) {
+                // Doesn't matter.
+            }
+        };
+        
+        IQBackChannelConduit conduit = new IQBackChannelConduit(testInputPacket, fakeXmppConnection);
+        conduit.setMessageObserver(obs);
+        Assert.assertEquals("The correct message observer is being used", obs,
+                            conduit.getMessageObserver());
     }
 
     @Test
-    public void test() {
-        XMPPConnection conn = xmppServer.connect("user1", "pw1");
-        conn.disconnect();
+    public void testXmppConnectionNotClosed() {
+        IQBackChannelConduit conduit = new IQBackChannelConduit(testInputPacket, fakeXmppConnection);
+        conduit.close();
+        
+        Assert.assertEquals("XMPP was not closed", false, testDisconnectedWasCalled);
     }
+    
+    public void testSendingReply() {
+//        CachedOutputStream outputStream = new CachedOutputStream();
 
+        
+    }
 }

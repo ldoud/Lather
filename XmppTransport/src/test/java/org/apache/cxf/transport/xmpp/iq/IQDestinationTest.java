@@ -42,35 +42,37 @@ public class IQDestinationTest {
     // Test stubs for MessageObserver
     private Message testMsg;
     private boolean testMsgRecvByObserver;
-    private MessageObserver fakeMsgObserver = new MessageObserver() {
-        @Override
-        public void onMessage(Message msg) {
-            testMsgRecvByObserver = true;
-            testMsg = msg;
-        }
-    };
+    private MessageObserver fakeMsgObserver;
 
     // Test stubs for an XMPP connections.
     private PacketListener testPacketListener;
     private boolean testDisconnectedWasCalled;
-    private XMPPConnection fakeXmppConnection = new XMPPConnection("doesNotMatter") {
-        @Override
-        public void addPacketListener(PacketListener packetListener, PacketFilter packetFilter) {
-            testPacketListener = packetListener;
-        }
-
-        public void disconnect() {
-            testDisconnectedWasCalled = true;
-        };
-    };
+    private XMPPConnection fakeXmppConnection;
 
     @Before
-    public void initializeTestData() {
+    public void initializeTestStubs() {
         testMsg = null;
         testMsgRecvByObserver = false;
+        fakeMsgObserver = new MessageObserver() {
+            @Override
+            public void onMessage(Message msg) {
+                testMsgRecvByObserver = true;
+                testMsg = msg;
+            }
+        };
 
         testPacketListener = null;
         testDisconnectedWasCalled = false;
+        fakeXmppConnection = new XMPPConnection("doesNotMatter") {
+            @Override
+            public void addPacketListener(PacketListener packetListener, PacketFilter packetFilter) {
+                testPacketListener = packetListener;
+            }
+
+            public void disconnect() {
+                testDisconnectedWasCalled = true;
+            };
+        };
     }
 
     @Test
