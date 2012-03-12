@@ -45,7 +45,7 @@ import org.jivesoftware.smack.packet.Packet;
  * 
  * @author Leon Doud
  */
-public class XMPPDestination implements Destination, PacketListener {
+public class IQDestination implements Destination, PacketListener {
     private XMPPConnection xmppConnection;
 
     // Values initialized during construction.
@@ -54,7 +54,7 @@ public class XMPPDestination implements Destination, PacketListener {
     // After messages are received they are passed to this observer.
     private MessageObserver msgObserver;
 
-    public XMPPDestination(EndpointInfo epInfo) {
+    public IQDestination(EndpointInfo epInfo) {
         // Initialize the address of the epRefType member.
         AttributedURIType address = new AttributedURIType();
         address.setValue(epInfo.getAddress());
@@ -135,7 +135,7 @@ public class XMPPDestination implements Destination, PacketListener {
                           new ByteArrayInputStream(soapMsg.getChildElementXML().getBytes()));
 
         Exchange msgExchange = new ExchangeImpl();
-        msgExchange.setConduit(new XMPPBackChannelConduit(soapMsg, xmppConnection));
+        msgExchange.setConduit(new IQBackChannelConduit(soapMsg, xmppConnection));
         cxfMsg.setExchange(msgExchange);
 
         // TODO Fix this so a different thread is used.

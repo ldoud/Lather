@@ -37,12 +37,12 @@ import org.jivesoftware.smack.packet.IQ;
  * 
  * @author Leon Doud
  */
-public class XMPPBackChannelConduit implements Conduit {
+public class IQBackChannelConduit implements Conduit {
     private MessageObserver msgObserver;
     private SoapPacket soapMsg;
     private XMPPConnection xmppConn;
 
-    public XMPPBackChannelConduit(SoapPacket msg, XMPPConnection connection) {
+    public IQBackChannelConduit(SoapPacket msg, XMPPConnection connection) {
         soapMsg = msg;
         xmppConn = connection;
     }

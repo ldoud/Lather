@@ -47,14 +47,14 @@ public class BasicConnectionFeature extends AbstractFeature {
         // All connection features must store the XMPP connection
         // using this method so the connection can be found
         // by the transport factory.
-        XMPPTransportFactory.storeConnection(bus, connection);
+        IQTransportFactory.storeConnection(bus, connection);
     }
 
     @Override
     public void initialize(Server server, Bus bus) {
         Destination destination = server.getDestination();
-        if (destination instanceof XMPPDestination) {
-            XMPPDestination xmppDestination = (XMPPDestination)destination;
+        if (destination instanceof IQDestination) {
+            IQDestination xmppDestination = (IQDestination)destination;
 
             // The XMPP requires a username and a resource name.
             // Use the QName of the service as the XMPP resource name.
@@ -69,8 +69,8 @@ public class BasicConnectionFeature extends AbstractFeature {
     @Override
     public void initialize(Client client, Bus bus) {
         Conduit conduit = client.getConduit();
-        if (conduit instanceof XMPPClientConduit) {
-            XMPPClientConduit xmppConduit = (XMPPClientConduit)conduit;
+        if (conduit instanceof IQClientConduit) {
+            IQClientConduit xmppConduit = (IQClientConduit)conduit;
             XMPPConnection connection = connectToXmpp(null);
             xmppConduit.setConnection(connection);
         } else {

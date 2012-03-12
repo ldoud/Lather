@@ -46,7 +46,7 @@ import org.jivesoftware.smack.provider.ProviderManager;
  * 
  * @author Leon Doud
  */
-public class XMPPTransportFactory extends AbstractTransportFactory implements DestinationFactory,
+public class IQTransportFactory extends AbstractTransportFactory implements DestinationFactory,
     ConduitInitiator {
     
     public static final List<String> DEFAULT_NAMESPACES = Arrays
@@ -54,7 +54,7 @@ public class XMPPTransportFactory extends AbstractTransportFactory implements De
     
     private static final String BUS_CONDUIT_XMPP_CONNECTION = "xmpp.transport.bus_conduit_connection";
 
-    public XMPPTransportFactory() throws XMPPException {
+    public IQTransportFactory() throws XMPPException {
         super(DEFAULT_NAMESPACES);
 
         SoapProvider xmppSoapFeature = new SoapProvider();
@@ -86,7 +86,7 @@ public class XMPPTransportFactory extends AbstractTransportFactory implements De
      */
     public Destination getDestination(EndpointInfo endpointInfo) throws IOException {
         // Connection feature will configure the XMPP connection later.
-        return new XMPPDestination(endpointInfo);
+        return new IQDestination(endpointInfo);
     }
 
     /**
@@ -105,12 +105,12 @@ public class XMPPTransportFactory extends AbstractTransportFactory implements De
     @Override
     public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType endpointType)
         throws IOException {
-        XMPPClientConduit conduit = new XMPPClientConduit(endpointType);
+        IQClientConduit conduit = new IQClientConduit(endpointType);
 
         // If there is common share connection in the bus
         // then setup the conduit to use it.
         Bus bus = getBus();
-        XMPPConnection connection = XMPPTransportFactory.getConnection(bus);
+        XMPPConnection connection = IQTransportFactory.getConnection(bus);
 
         // A null connection indicates a connection feature will
         // later configure the conduit with a connection.

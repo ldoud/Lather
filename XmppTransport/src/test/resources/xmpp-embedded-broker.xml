@@ -50,7 +50,7 @@
        <amq:plugins>
        	<amq:simpleAuthenticationPlugin>
        		<amq:users>
-       			<amq:authenticationUser username="user1" password="user1" groups="users,admins"/>
+       			<amq:authenticationUser username="user1" password="pw1" groups="users,admins"/>
        		</amq:users>
        	</amq:simpleAuthenticationPlugin>
        </amq:plugins>

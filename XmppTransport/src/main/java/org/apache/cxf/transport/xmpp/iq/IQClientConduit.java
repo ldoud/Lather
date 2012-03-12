@@ -39,7 +39,7 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 
-public class XMPPClientConduit implements Conduit, PacketListener {
+public class IQClientConduit implements Conduit, PacketListener {
     // After messages are received they are passed to this observer.
     private MessageObserver msgObserver;
 
@@ -53,7 +53,7 @@ public class XMPPClientConduit implements Conduit, PacketListener {
     // their PacketId so they can be retrieved when a response is received.
     private AbstractMap<String, Exchange> exchangeCorrelationTable = new HashMap<String, Exchange>();
 
-    public XMPPClientConduit(EndpointReferenceType target) {
+    public IQClientConduit(EndpointReferenceType target) {
         this.target = target;
     }
 

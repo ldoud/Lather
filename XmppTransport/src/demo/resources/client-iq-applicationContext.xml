@@ -34,7 +34,7 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd"
     	</cxf:features>
     </cxf:bus>
     
-    <bean class="org.apache.cxf.transport.xmpp.iq.XMPPTransportFactory">
+    <bean class="org.apache.cxf.transport.xmpp.iq.IQTransportFactory">
     	<property name="bus" ref="cxf"/>
     </bean>
     
