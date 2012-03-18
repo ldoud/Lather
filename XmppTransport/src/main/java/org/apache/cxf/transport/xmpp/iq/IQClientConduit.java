@@ -25,24 +25,33 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.AbstractMap;
 import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.xmpp.connection.XMPPConnectionFactory;
+import org.apache.cxf.transport.xmpp.connection.XMPPConnectionUser;
 import org.apache.cxf.transport.xmpp.smackx.soap.SoapPacket;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
+import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 
-public class IQClientConduit implements Conduit, PacketListener {
+public class IQClientConduit implements Conduit, PacketListener, XMPPConnectionUser {
+    
+    private static final Logger LOGGER = LogUtils.getLogger(IQClientConduit.class);
+    
     // After messages are received they are passed to this observer.
     private MessageObserver msgObserver;
-
+    
     // How to deliver the message to the service.
     private XMPPConnection xmppConnection;
 
@@ -57,16 +66,6 @@ public class IQClientConduit implements Conduit, PacketListener {
         this.target = target;
     }
 
-    public void setConnection(XMPPConnection connection) {
-        xmppConnection = connection;
-        xmppConnection.addPacketListener(this, new PacketFilter() {
-            @Override
-            public boolean accept(Packet xmppPacket) {
-                return true;
-            }
-        });
-    }
-
     @Override
     public MessageObserver getMessageObserver() {
         return msgObserver;
@@ -77,14 +76,37 @@ public class IQClientConduit implements Conduit, PacketListener {
         msgObserver = observer;
     }
 
-    /**
-     * Closes the XMPP connection that is used to send and receive messages.
-     */
     @Override
-    public void close() {
-        xmppConnection.disconnect();
+    public EndpointReferenceType getTarget() {
+        return target;
     }
 
+    @Override
+    public void prepare(Message msg) throws IOException {
+        msg.setContent(OutputStream.class, new CachedOutputStream());
+    }
+
+
+    @Override
+    public void initialize(XMPPConnectionFactory factory) {
+        try {
+            xmppConnection = factory.login();
+            xmppConnection.addPacketListener(this, new PacketFilter() {
+                @Override
+                public boolean accept(Packet xmppPacket) {
+                    return true;
+                }
+            });
+        } catch (XMPPException e) {
+            LOGGER.log(Level.SEVERE, "Failed to login to XMPP", e);
+        }
+    }
+    
+    @Override
+    public void close() {
+        // Does nothing.
+    }
+    
     @Override
     public void close(Message msg) throws IOException {
         // Take the contents of the cached buffer
@@ -113,16 +135,6 @@ public class IQClientConduit implements Conduit, PacketListener {
             // Send the message to the service.
             xmppConnection.sendPacket(soapOverXmpp);
         }
-    }
-
-    @Override
-    public EndpointReferenceType getTarget() {
-        return target;
-    }
-
-    @Override
-    public void prepare(Message msg) throws IOException {
-        msg.setContent(OutputStream.class, new CachedOutputStream());
     }
 
     /**

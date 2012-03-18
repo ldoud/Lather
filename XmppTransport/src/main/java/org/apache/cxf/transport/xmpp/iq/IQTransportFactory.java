@@ -34,7 +34,6 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.xmpp.smackx.soap.SoapProvider;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.provider.ProviderManager;
 
@@ -51,8 +50,7 @@ public class IQTransportFactory extends AbstractTransportFactory implements Dest
     
     public static final List<String> DEFAULT_NAMESPACES = Arrays
     .asList("http://cxf.apache.org/transports/xmpp");
-    
-    private static final String BUS_CONDUIT_XMPP_CONNECTION = "xmpp.transport.bus_conduit_connection";
+   
 
     public IQTransportFactory() throws XMPPException {
         super(DEFAULT_NAMESPACES);
@@ -63,14 +61,6 @@ public class IQTransportFactory extends AbstractTransportFactory implements Dest
                                                     xmppSoapFeature);
         ProviderManager.getInstance().addIQProvider("Envelope", "http://schemas.xmlsoap.org/soap/envelope/",
                                                     xmppSoapFeature);
-    }
-    
-    public static void storeConnection(Bus bus, XMPPConnection connection) {
-        bus.setProperty(BUS_CONDUIT_XMPP_CONNECTION, connection);
-    }
-
-    public static XMPPConnection getConnection(Bus bus) {
-        return (XMPPConnection)bus.getProperty(BUS_CONDUIT_XMPP_CONNECTION);
     }
 
     /**
@@ -85,7 +75,6 @@ public class IQTransportFactory extends AbstractTransportFactory implements Dest
      * Creates a destination for a service that has its own XMPP connection.
      */
     public Destination getDestination(EndpointInfo endpointInfo) throws IOException {
-        // Connection feature will configure the XMPP connection later.
         return new IQDestination(endpointInfo);
     }
 
@@ -105,20 +94,7 @@ public class IQTransportFactory extends AbstractTransportFactory implements Dest
     @Override
     public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType endpointType)
         throws IOException {
-        IQClientConduit conduit = new IQClientConduit(endpointType);
-
-        // If there is common share connection in the bus
-        // then setup the conduit to use it.
-        Bus bus = getBus();
-        XMPPConnection connection = IQTransportFactory.getConnection(bus);
-
-        // A null connection indicates a connection feature will
-        // later configure the conduit with a connection.
-        if (connection != null) {
-            conduit.setConnection(connection);
-        }
-
-        return conduit;
+        return new IQClientConduit(endpointType);
     }
 
 }
