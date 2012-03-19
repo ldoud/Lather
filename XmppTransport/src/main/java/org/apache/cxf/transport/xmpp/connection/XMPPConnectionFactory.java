@@ -19,6 +19,7 @@
 
 package org.apache.cxf.transport.xmpp.connection;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
@@ -34,7 +35,7 @@ public interface XMPPConnectionFactory {
      * @return A connection that might be shared, so don't close it.
      * @throws XMPPException If the login fails.
      */
-    public XMPPConnection loginDestination(EndpointInfo epi) throws XMPPException;
+    public XMPPConnection loginDestination(EndpointInfo epi, Bus bus) throws XMPPException;
     
-    public XMPPConnection loginConduit(EndpointInfo epi) throws XMPPException;
+    public XMPPConnection loginConduit(EndpointInfo epi, Bus bus) throws XMPPException;
 }

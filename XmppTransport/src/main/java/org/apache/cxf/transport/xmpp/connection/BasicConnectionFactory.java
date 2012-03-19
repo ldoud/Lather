@@ -22,6 +22,7 @@ package org.apache.cxf.transport.xmpp.connection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.service.model.EndpointInfo;
 import org.jivesoftware.smack.XMPPConnection;
@@ -62,7 +63,7 @@ public class BasicConnectionFactory implements XMPPConnectionFactory {
     }
 
     @Override
-    public XMPPConnection loginDestination(EndpointInfo epi) throws XMPPException {
+    public XMPPConnection loginDestination(EndpointInfo epi, Bus bus) throws XMPPException {
         String resourceName = epi.getService().getName().toString();
         
         XMPPConnection xmppConnection = new XMPPConnection(xmppServiceName);
@@ -74,13 +75,14 @@ public class BasicConnectionFactory implements XMPPConnectionFactory {
     }
 
     @Override
-    public XMPPConnection loginConduit(EndpointInfo epi) throws XMPPException {
+    public XMPPConnection loginConduit(EndpointInfo epi, Bus bus) throws XMPPException {
         if (clientConnection == null) {
             LOGGER.log(Level.INFO, "Creating conduit connection");
             
+            String resourceName = "common-client-"+bus.getId();
             XMPPConnection xmppConnection = new XMPPConnection(xmppServiceName);
             xmppConnection.connect();
-            xmppConnection.login(xmppUsername, xmppPassword);
+            xmppConnection.login(xmppUsername, xmppPassword, resourceName);
             
             clientConnection = xmppConnection;
         }
