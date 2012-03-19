@@ -93,7 +93,7 @@ public class IQDestinationTest {
         info.setAddress("test-address");
 
         IQDestination destination = new IQDestination(info);
-        destination.setConnection(fakeXmppConnection);
+        destination.setXmppConnection(fakeXmppConnection, true);
 
         Assert.assertEquals("The destination registered for XMPP packets", destination, testPacketListener);
     }
@@ -104,7 +104,7 @@ public class IQDestinationTest {
         info.setAddress("test-address");
 
         IQDestination destination = new IQDestination(info);
-        destination.setConnection(fakeXmppConnection);
+        destination.setXmppConnection(fakeXmppConnection, true);
         destination.shutdown();
 
         Assert.assertEquals("XMPP connection was closed", true, testDisconnectedWasCalled);
@@ -140,7 +140,7 @@ public class IQDestinationTest {
         info.setAddress("test-address");
 
         IQDestination destination = new IQDestination(info);
-        destination.setConnection(fakeXmppConnection);
+        destination.setXmppConnection(fakeXmppConnection, false);
         destination.setMessageObserver(fakeMsgObserver);
 
         String xmlMsg = "<something>that does not matter</something>";
