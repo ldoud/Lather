@@ -24,23 +24,23 @@
 		http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd
 ">
 
-    <cxf:bus bus="cxf"/>
+    <cxf:bus name="cxf"/>
     
     <bean class="org.apache.cxf.transport.xmpp.iq.IQTransportFactory">
     	<property name="bus" ref="cxf"/>
+    	<property name="connectionFactory">
+    		<bean class="org.apache.cxf.transport.xmpp.connection.BasicConnectionFactory">
+		    	<property name="xmppServiceName" value="localhost.localdomain"/>
+		    	<property name="xmppUsername" value="service1"/>
+		    	<property name="xmppPassword" value="service1"/>			
+			</bean>
+    	</property>
     </bean>
 
 	<jaxws:endpoint 
 		id="HelloWorld" 
 		transportId="http://cxf.apache.org/transports/xmpp"
 		implementor="test.xmpp.service.HelloWorldService">
-		<jaxws:features>
-			<bean class="org.apache.cxf.transport.xmpp.iq.BasicConnectionFeature">
-		    	<property name="xmppServiceName" value="localhost.localdomain"/>
-		    	<property name="xmppUsername" value="service1"/>
-		    	<property name="xmppPassword" value="service1"/>			
-			</bean>
-		</jaxws:features>
 	</jaxws:endpoint>
 
 </beans>

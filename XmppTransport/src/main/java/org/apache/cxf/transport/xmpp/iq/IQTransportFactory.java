@@ -32,8 +32,11 @@ import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.ConduitInitiator;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.DestinationFactory;
+import org.apache.cxf.transport.xmpp.connection.XMPPConnectionFactory;
+import org.apache.cxf.transport.xmpp.connection.XMPPTransportFactory;
 import org.apache.cxf.transport.xmpp.smackx.soap.SoapProvider;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.provider.ProviderManager;
 
@@ -45,15 +48,17 @@ import org.jivesoftware.smack.provider.ProviderManager;
  * 
  * @author Leon Doud
  */
-public class IQTransportFactory extends AbstractTransportFactory implements DestinationFactory,
-    ConduitInitiator {
+public class IQTransportFactory extends AbstractTransportFactory 
+    implements DestinationFactory, ConduitInitiator, XMPPTransportFactory {
     
     public static final List<String> DEFAULT_NAMESPACES = Arrays
     .asList("http://cxf.apache.org/transports/xmpp");
-   
+    
+    private XMPPConnectionFactory connectionFactory;
 
     public IQTransportFactory() throws XMPPException {
-        super(DEFAULT_NAMESPACES);
+        super();
+        setTransportIds(DEFAULT_NAMESPACES);
 
         SoapProvider xmppSoapFeature = new SoapProvider();
 
@@ -72,10 +77,19 @@ public class IQTransportFactory extends AbstractTransportFactory implements Dest
     }
 
     /**
-     * Creates a destination for a service that has its own XMPP connection.
+     * Creates a destination for a service that receives XMPP messages.
      */
     public Destination getDestination(EndpointInfo endpointInfo) throws IOException {
-        return new IQDestination(endpointInfo);
+        IQDestination dest = new IQDestination(endpointInfo);
+        
+        try {
+            XMPPConnection conn = connectionFactory.loginDestination(endpointInfo);
+            dest.setConnection(conn);
+        } catch (XMPPException e) {
+           throw new IOException(e);
+        }
+        
+        return dest;
     }
 
     /**
@@ -92,9 +106,21 @@ public class IQTransportFactory extends AbstractTransportFactory implements Dest
      * the bus.
      */
     @Override
-    public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType endpointType)
-        throws IOException {
-        return new IQClientConduit(endpointType);
+    public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType endpointType) throws IOException {
+        IQClientConduit conduit = new IQClientConduit(endpointType);
+        
+        try {
+            XMPPConnection conn = connectionFactory.loginConduit(endpointInfo);
+            conduit.setConnection(conn);
+        } catch (XMPPException e) {
+           throw new IOException(e);
+        }
+        
+        return conduit;        
     }
 
+    @Override
+    public void setConnectionFactory(XMPPConnectionFactory factory) {
+        connectionFactory = factory;
+    }
 }

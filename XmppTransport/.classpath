@@ -4,12 +4,12 @@
 	<classpathentry kind="src" path="src/demo/java"/>
 	<classpathentry kind="src" path="src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
-	<classpathentry kind="lib" path="lib/cxf-2.4.1.jar" sourcepath="/home/ic2te/apache-cxf-2.4.1-src/rt"/>
 	<classpathentry kind="lib" path="lib/spring-beans-3.0.5.RELEASE.jar"/>
 	<classpathentry kind="lib" path="lib/spring-context-3.0.5.RELEASE.jar"/>
 	<classpathentry kind="lib" path="lib/spring-core-3.0.5.RELEASE.jar"/>
 	<classpathentry kind="lib" path="lib/smack.jar"/>
 	<classpathentry kind="lib" path="lib/smackx.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
+	<classpathentry kind="lib" path="lib/cxf-2.3.9.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

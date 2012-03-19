@@ -61,7 +61,8 @@ public class XMPPTransportFactory extends AbstractTransportFactory implements De
     }
 
     public XMPPTransportFactory() throws XMPPException {
-        super(DEFAULT_NAMESPACES);
+        super();
+        setTransportIds(DEFAULT_NAMESPACES);
 
         // Log into XMPP.
         xmppConnection.connect();

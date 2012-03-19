@@ -31,6 +31,7 @@ import org.apache.cxf.service.model.EndpointInfo;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.MessageObserver;
+import org.apache.cxf.transport.xmpp.connection.XMPPConnectionUser;
 import org.apache.cxf.transport.xmpp.smackx.soap.SoapPacket;
 import org.apache.cxf.ws.addressing.AttributedURIType;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
@@ -45,7 +46,8 @@ import org.jivesoftware.smack.packet.Packet;
  * 
  * @author Leon Doud
  */
-public class IQDestination implements Destination, PacketListener {
+public class IQDestination implements Destination, PacketListener, XMPPConnectionUser {
+    
     private XMPPConnection xmppConnection;
 
     // Values initialized during construction.
@@ -60,7 +62,8 @@ public class IQDestination implements Destination, PacketListener {
         address.setValue(epInfo.getAddress());
         epRefType.setAddress(address);
     }
-
+    
+    @Override
     public void setConnection(XMPPConnection newConnection) {
         xmppConnection = newConnection;
         xmppConnection.addPacketListener(this, new PacketFilter() {
@@ -120,9 +123,7 @@ public class IQDestination implements Destination, PacketListener {
      */
     @Override
     public void shutdown() {
-        if (xmppConnection != null) {
-            xmppConnection.disconnect();
-        }
+        // Nothing
     }
 
     @Override

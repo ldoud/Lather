@@ -19,6 +19,8 @@
 
 package org.apache.cxf.transport.xmpp.connection;
 
+import org.jivesoftware.smack.XMPPConnection;
+
 /**
  * Classes that require XMPP connection feature.
  */
@@ -29,5 +31,5 @@ public interface XMPPConnectionUser {
      * Therefore the factory should not be used until the server is started.
      * @param factory Factory that is used for creating connections.
      */
-    public void initialize(XMPPConnectionFactory factory);
+    public void setConnection(XMPPConnection conn);
 }
