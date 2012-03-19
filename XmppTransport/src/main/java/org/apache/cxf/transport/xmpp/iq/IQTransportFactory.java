@@ -36,7 +36,6 @@ import org.apache.cxf.transport.xmpp.connection.XMPPConnectionFactory;
 import org.apache.cxf.transport.xmpp.connection.XMPPTransportFactory;
 import org.apache.cxf.transport.xmpp.smackx.soap.SoapProvider;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
-import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.provider.ProviderManager;
 
@@ -83,8 +82,7 @@ public class IQTransportFactory extends AbstractTransportFactory
         IQDestination dest = new IQDestination(endpointInfo);
         
         try {
-            XMPPConnection conn = connectionFactory.loginDestination(endpointInfo, bus);
-            dest.setConnection(conn);
+            connectionFactory.loginDestination(dest, endpointInfo, bus);
         } catch (XMPPException e) {
            throw new IOException(e);
         }
@@ -110,8 +108,7 @@ public class IQTransportFactory extends AbstractTransportFactory
         IQClientConduit conduit = new IQClientConduit(endpointType);
         
         try {
-            XMPPConnection conn = connectionFactory.loginConduit(endpointInfo, bus);
-            conduit.setConnection(conn);
+            connectionFactory.loginConduit(conduit, endpointInfo, bus);
         } catch (XMPPException e) {
            throw new IOException(e);
         }

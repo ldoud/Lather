@@ -25,6 +25,7 @@ import java.util.logging.Logger;
 import org.apache.cxf.Bus;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.transport.xmpp.common.XMPPConnectionUser;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
@@ -63,7 +64,7 @@ public class BasicConnectionFactory implements XMPPConnectionFactory {
     }
 
     @Override
-    public XMPPConnection loginDestination(EndpointInfo epi, Bus bus) throws XMPPException {
+    public void loginDestination(XMPPConnectionUser dest, EndpointInfo epi, Bus bus) throws XMPPException {
         String resourceName = epi.getService().getName().toString();
         
         XMPPConnection xmppConnection = new XMPPConnection(xmppServiceName);
@@ -71,11 +72,11 @@ public class BasicConnectionFactory implements XMPPConnectionFactory {
         xmppConnection.login(xmppUsername, xmppPassword, resourceName);
         LOGGER.info("Destination logged in with JID: "+xmppConnection.getUser());
         
-        return xmppConnection;
+        dest.setXmppConnection(xmppConnection, false);
     }
 
     @Override
-    public XMPPConnection loginConduit(EndpointInfo epi, Bus bus) throws XMPPException {
+    public void loginConduit(XMPPConnectionUser conduit, EndpointInfo epi, Bus bus) throws XMPPException {
         if (clientConnection == null) {
             LOGGER.log(Level.INFO, "Creating conduit connection");
             
@@ -88,6 +89,6 @@ public class BasicConnectionFactory implements XMPPConnectionFactory {
         }
         
         LOGGER.info("Client logged in with JID: "+clientConnection.getUser());
-        return clientConnection;
+        conduit.setXmppConnection(clientConnection, true);
     }
 }

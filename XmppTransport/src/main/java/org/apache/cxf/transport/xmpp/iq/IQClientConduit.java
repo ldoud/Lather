@@ -32,9 +32,7 @@ import org.apache.cxf.io.CachedOutputStream;
 import org.apache.cxf.message.Exchange;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
-import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.transport.MessageObserver;
-import org.apache.cxf.transport.xmpp.connection.XMPPConnectionUser;
+import org.apache.cxf.transport.xmpp.common.AbstractConduit;
 import org.apache.cxf.transport.xmpp.smackx.soap.SoapPacket;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.jivesoftware.smack.PacketListener;
@@ -42,61 +40,28 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 
-public class IQClientConduit implements Conduit, PacketListener, XMPPConnectionUser {
+public class IQClientConduit extends AbstractConduit implements PacketListener {
+    
     private static final Logger LOGGER = LogUtils.getLogger(IQClientConduit.class);
-    
-    // After messages are received they are passed to this observer.
-    private MessageObserver msgObserver;
-    
-    // How to deliver the message to the service.
-    private XMPPConnection xmppConnection;
-
-    // Information about service being called.
-    private EndpointReferenceType target;
 
     // Messages sent to the service are stored in this table based on
     // their PacketId so they can be retrieved when a response is received.
     private AbstractMap<String, Exchange> exchangeCorrelationTable = new HashMap<String, Exchange>();
 
     public IQClientConduit(EndpointReferenceType target) {
-        this.target = target;
+        super(target);
     }
 
     @Override
-    public MessageObserver getMessageObserver() {
-        return msgObserver;
-    }
-
-    @Override
-    public void setMessageObserver(MessageObserver observer) {
-        msgObserver = observer;
-    }
-
-    @Override
-    public EndpointReferenceType getTarget() {
-        return target;
-    }
-
-    @Override
-    public void prepare(Message msg) throws IOException {
-        msg.setContent(OutputStream.class, new CachedOutputStream());
-    }
-
-
-    @Override
-    public void setConnection(XMPPConnection newConnection) {
-        xmppConnection = newConnection;
-        xmppConnection.addPacketListener(this, new PacketFilter() {
+    public void setXmppConnection(XMPPConnection newConnection, boolean shared) {
+        super.setXmppConnection(newConnection, shared);
+        
+        newConnection.addPacketListener(this, new PacketFilter() {
             @Override
             public boolean accept(Packet anyPacket) {
                 return true;
             }
         });
-    }
-    
-    @Override
-    public void close() {
-        // Does nothing.
     }
     
     @Override
@@ -126,7 +91,7 @@ public class IQClientConduit implements Conduit, PacketListener, XMPPConnectionU
             exchangeCorrelationTable.put(soapOverXmpp.getPacketID(), msg.getExchange());
 
             // Send the message to the service.
-            xmppConnection.sendPacket(soapOverXmpp);
+            getXmppConnection().sendPacket(soapOverXmpp);
         }
     }
 
@@ -148,7 +113,7 @@ public class IQClientConduit implements Conduit, PacketListener, XMPPConnectionU
         msgExchange.setInMessage(responseMsg);
 
         // TODO Fix this so the response is processed by a different thread.
-        msgObserver.onMessage(responseMsg);
+        getMessageObserver().onMessage(responseMsg);
     }
 
 }

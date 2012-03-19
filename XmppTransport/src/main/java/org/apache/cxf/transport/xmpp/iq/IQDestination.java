@@ -20,7 +20,6 @@
 package org.apache.cxf.transport.xmpp.iq;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.cxf.message.Exchange;
@@ -28,13 +27,8 @@ import org.apache.cxf.message.ExchangeImpl;
 import org.apache.cxf.message.Message;
 import org.apache.cxf.message.MessageImpl;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.Conduit;
-import org.apache.cxf.transport.Destination;
-import org.apache.cxf.transport.MessageObserver;
-import org.apache.cxf.transport.xmpp.connection.XMPPConnectionUser;
+import org.apache.cxf.transport.xmpp.common.AbstractDestination;
 import org.apache.cxf.transport.xmpp.smackx.soap.SoapPacket;
-import org.apache.cxf.ws.addressing.AttributedURIType;
-import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.filter.PacketFilter;
@@ -46,27 +40,17 @@ import org.jivesoftware.smack.packet.Packet;
  * 
  * @author Leon Doud
  */
-public class IQDestination implements Destination, PacketListener, XMPPConnectionUser {
-    
-    private XMPPConnection xmppConnection;
-
-    // Values initialized during construction.
-    private EndpointReferenceType epRefType = new EndpointReferenceType();
-
-    // After messages are received they are passed to this observer.
-    private MessageObserver msgObserver;
+public class IQDestination extends AbstractDestination implements PacketListener {
 
     public IQDestination(EndpointInfo epInfo) {
-        // Initialize the address of the epRefType member.
-        AttributedURIType address = new AttributedURIType();
-        address.setValue(epInfo.getAddress());
-        epRefType.setAddress(address);
+        super(epInfo);
     }
     
     @Override
-    public void setConnection(XMPPConnection newConnection) {
-        xmppConnection = newConnection;
-        xmppConnection.addPacketListener(this, new PacketFilter() {
+    public void setXmppConnection(XMPPConnection newConnection, boolean isShared) {
+        super.setXmppConnection(newConnection, isShared);
+
+        newConnection.addPacketListener(this, new PacketFilter() {
             @Override
             public boolean accept(Packet anyPacket) {
                 return true;
@@ -74,73 +58,20 @@ public class IQDestination implements Destination, PacketListener, XMPPConnectio
         });
     }
 
-    /**
-     * Required by the Destination interface.
-     * 
-     * @see org.apache.cxf.transport.Destination
-     */
-    @Override
-    public void setMessageObserver(MessageObserver observer) {
-        msgObserver = observer;
-    }
-
-    /**
-     * Required by the Destination interface.
-     * 
-     * @see org.apache.cxf.transport.Destination
-     */
-    @Override
-    public EndpointReferenceType getAddress() {
-        return epRefType;
-    }
-
-    /**
-     * Not used. The back channel is set on the exchange of the message when the message is received. Required
-     * by the Destination interface.
-     * 
-     * @see org.apache.cxf.transport.Destination
-     */
-    @Override
-    public Conduit getBackChannel(Message inMsg, Message notUsedMsg, EndpointReferenceType notUsedEpRefType)
-        throws IOException {
-        return null;
-    }
-
-    /**
-     * Required by the Destination interface.
-     * 
-     * @see org.apache.cxf.transport.Destination
-     */
-    @Override
-    public MessageObserver getMessageObserver() {
-        return msgObserver;
-    }
-
-    /**
-     * Log out of XMPP. Required by the Destination interface.
-     * 
-     * @see org.apache.cxf.transport.Destination
-     */
-    @Override
-    public void shutdown() {
-        // Nothing
-    }
-
     @Override
     public void processPacket(Packet msg) {
         SoapPacket soapMsg = (SoapPacket)msg;
 
-        // TODO Is there a better input stream than ByteArrayInputStream?
         Message cxfMsg = new MessageImpl();
         cxfMsg.setContent(InputStream.class,
                           new ByteArrayInputStream(soapMsg.getChildElementXML().getBytes()));
 
         Exchange msgExchange = new ExchangeImpl();
-        msgExchange.setConduit(new IQBackChannelConduit(soapMsg, xmppConnection));
+        msgExchange.setConduit(new IQBackChannelConduit(soapMsg, getXmppConnection()));
         cxfMsg.setExchange(msgExchange);
 
         // TODO Fix this so a different thread is used.
-        msgObserver.onMessage(cxfMsg);
+        getMessageObserver().onMessage(cxfMsg);
     }
 
 }
