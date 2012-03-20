@@ -30,4 +30,9 @@ public class HelloWorldService implements HelloWorld {
         System.out.println("Hello " + text);
         return "Hello " + text;
     }
+
+    @Override
+    public void yell(String loudMsg) {
+        System.out.println("Yelling: "+loudMsg);
+    }
 }

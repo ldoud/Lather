@@ -19,9 +19,13 @@
 
 package test.xmpp.service;
 
+import javax.jws.Oneway;
 import javax.jws.WebService;
 
 @WebService
 public interface HelloWorld {
     public String sayHi(String text);
+    
+    @Oneway
+    public void yell(String loudMsg);
 }

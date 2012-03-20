@@ -10,11 +10,13 @@ import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.endpoint.Client;
 import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
+import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.xmpp.common.XMPPConnectionUser;
 import org.apache.cxf.transport.xmpp.iq.IQClientConduit;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smackx.pubsub.LeafNode;
 import org.jivesoftware.smackx.pubsub.Node;
 import org.jivesoftware.smackx.pubsub.PubSubManager;
 import org.jivesoftware.smackx.pubsub.Subscription;
@@ -24,7 +26,7 @@ public class PubSubServiceNameNode extends AbstractFeature {
     
     private static final Logger LOGGER = LogUtils.getLogger(IQClientConduit.class);
     
-    private boolean createIfMissing;
+    private boolean createIfMissing = true;
     
     public void setCreateIfMissing(boolean create) {
         createIfMissing = create;
@@ -59,8 +61,25 @@ public class PubSubServiceNameNode extends AbstractFeature {
     
     @Override
     public void initialize(Client client, Bus bus) {
-        // TODO Auto-generated method stub
-        super.initialize(client, bus);
+        Conduit conduit = client.getConduit();
+        
+        if (conduit instanceof XMPPConnectionUser && conduit instanceof PubSubClientConduit) {
+            String serviceName = client.getEndpoint().getEndpointInfo().getName().toString();
+            XMPPConnectionUser connUser = (XMPPConnectionUser)conduit;
+            XMPPConnection connection = connUser.getXmppConnection();
+            
+            Node pubSubNode = findOrCreateNode(serviceName, connection);
+            
+            if (pubSubNode instanceof LeafNode) {
+                ((PubSubClientConduit)conduit).setNode((LeafNode)pubSubNode);
+            }
+            else {
+                LOGGER.log(Level.SEVERE, "Node cannot be used to published items");
+            }
+        }
+        else {
+            LOGGER.log(Level.WARNING, "This feature is only for PubSubDestinations");
+        }
     }
 
     private void findOrCreateSubscription(ItemEventListener<?> listener, String serviceName, XMPPConnection connection,
