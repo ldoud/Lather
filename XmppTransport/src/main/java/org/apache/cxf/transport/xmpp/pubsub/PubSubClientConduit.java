@@ -11,6 +11,7 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.pubsub.LeafNode;
 import org.jivesoftware.smackx.pubsub.PayloadItem;
+import org.jivesoftware.smackx.pubsub.SimplePayload;
 
 public class PubSubClientConduit extends AbstractConduit {
     
@@ -37,10 +38,12 @@ public class PubSubClientConduit extends AbstractConduit {
             StringBuilder soapEnvelope = new StringBuilder();
             output.writeCacheTo(soapEnvelope);
 
-            SoapPacket soapOverXmpp = new SoapPacket();
-            soapOverXmpp.setEnvelope(soapEnvelope.toString());
+//            SoapPacket soapOverXmpp = new SoapPacket();
+//            soapOverXmpp.setEnvelope(soapEnvelope.toString());
             
-            PayloadItem<SoapPacket> pi = new PayloadItem<SoapPacket>(soapOverXmpp);
+            SimplePayload payload = new SimplePayload("Envelope", "http://www.w3.org/2003/05/soap-envelope", soapEnvelope.toString());
+            
+            PayloadItem<SimplePayload> pi = new PayloadItem<SimplePayload>(payload);
             try {
                 targetNode.send(pi);
             } catch (XMPPException e) {

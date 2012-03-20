@@ -99,13 +99,18 @@ public class PubSubServiceNameNode extends AbstractFeature {
                 alreadySubscribed = sub.getJid().equals(connection.getUser());
             }
             
+            pubSubNode.addItemEventListener(listener);
+            
             if (!alreadySubscribed) {
-                pubSubNode.addItemEventListener(listener);
                 try {
+                    LOGGER.log(Level.INFO, "Creating subscription for destination");
                     pubSubNode.subscribe(connection.getUser());
                 } catch (XMPPException failedToSub) {
                     LOGGER.log(Level.SEVERE, "JID: "+connection.getUser()+ " to node: "+serviceName);
                 }
+            }
+            else {
+                LOGGER.log(Level.INFO, "Found existing subscription for destination");
             }
             
         } catch (XMPPException failedToGetSubscriptions) {
