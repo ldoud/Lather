@@ -13,7 +13,6 @@ import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.xmpp.common.XMPPConnectionUser;
-import org.apache.cxf.transport.xmpp.iq.IQClientConduit;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.pubsub.LeafNode;
@@ -24,7 +23,7 @@ import org.jivesoftware.smackx.pubsub.listener.ItemEventListener;
 
 public class PubSubServiceNameNode extends AbstractFeature {
     
-    private static final Logger LOGGER = LogUtils.getLogger(IQClientConduit.class);
+    private static final Logger LOGGER = LogUtils.getLogger(PubSubServiceNameNode.class);
     
     private boolean createIfMissing = true;
     
@@ -43,7 +42,9 @@ public class PubSubServiceNameNode extends AbstractFeature {
         Destination dest = server.getDestination();
         
         if (dest instanceof XMPPConnectionUser && dest instanceof ItemEventListener<?>) {
-            String serviceName = server.getEndpoint().getEndpointInfo().getName().toString();
+            //String serviceName = server.getEndpoint().getBinding().getBindingInfo().getName().toString();
+            String serviceName = server.getEndpoint().getService().getName().toString();
+            LOGGER.log(Level.INFO, "Node name for server destination: "+serviceName);
             XMPPConnectionUser connUser = (XMPPConnectionUser)dest;
             XMPPConnection connection = connUser.getXmppConnection();
             
@@ -64,7 +65,13 @@ public class PubSubServiceNameNode extends AbstractFeature {
         Conduit conduit = client.getConduit();
         
         if (conduit instanceof XMPPConnectionUser && conduit instanceof PubSubClientConduit) {
-            String serviceName = client.getEndpoint().getEndpointInfo().getName().toString();
+            //String serviceName = client.getEndpoint().getEndpointInfo().getName().toString();
+            String serviceName = client.getEndpoint().getService().getName().toString();
+            int index = serviceName.lastIndexOf("Service");
+            if (index > -1) {
+                serviceName = serviceName.substring(0, index);
+            }
+            LOGGER.log(Level.INFO, "Node name for client conduit: "+serviceName);
             XMPPConnectionUser connUser = (XMPPConnectionUser)conduit;
             XMPPConnection connection = connUser.getXmppConnection();
             
