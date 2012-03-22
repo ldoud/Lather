@@ -34,7 +34,7 @@ public class Client {
         System.out.println("Elapsed time: " + (System.currentTimeMillis() - startTime));
         
         startTime = System.currentTimeMillis();
-        client.yell("Second messages!!");
+        client.yell("Second message!!");
         System.out.println("Elapsed time: " + (System.currentTimeMillis() - startTime));
     }
 }
