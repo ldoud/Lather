@@ -12,26 +12,27 @@ import org.apache.cxf.transport.xmpp.common.AbstractDestination;
 import org.apache.cxf.transport.xmpp.smackx.soap.SoapPacket;
 import org.jivesoftware.smackx.pubsub.ItemPublishEvent;
 import org.jivesoftware.smackx.pubsub.PayloadItem;
+import org.jivesoftware.smackx.pubsub.SimplePayload;
 import org.jivesoftware.smackx.pubsub.listener.ItemEventListener;
 
-public class PubSubDestination extends AbstractDestination implements ItemEventListener<PayloadItem<SoapPacket>>{
+public class PubSubDestination extends AbstractDestination implements ItemEventListener<PayloadItem<SimplePayload>>{
 
     public PubSubDestination(EndpointInfo epInfo) {
         super(epInfo);
     }
 
     @Override
-    public void handlePublishedItems(ItemPublishEvent<PayloadItem<SoapPacket>> events) {   
+    public void handlePublishedItems(ItemPublishEvent<PayloadItem<SimplePayload>> events) {   
         System.out.println("Number of items received: "+events.getItems().size());
         
-        for(PayloadItem<SoapPacket> pi : events.getItems())
+        for(PayloadItem<SimplePayload> pi : events.getItems())
         {
-            SoapPacket soapMsg = pi.getPayload();
-            System.out.println("Msg: "+soapMsg.getChildElementXML());
+            SimplePayload soapMsg = pi.getPayload();
+            System.out.println("Msg: "+soapMsg.toXML());
             
             Message cxfMsg = new MessageImpl();
             cxfMsg.setContent(InputStream.class,
-                              new ByteArrayInputStream(soapMsg.getChildElementXML().getBytes()));
+                              new ByteArrayInputStream(soapMsg.toXML().getBytes()));
     
             Exchange msgExchange = new ExchangeImpl();
             msgExchange.setOneWay(true);
