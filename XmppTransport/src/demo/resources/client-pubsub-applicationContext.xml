@@ -41,7 +41,9 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd"
         serviceClass="test.xmpp.service.HelloWorld"
         transportId="http://cxf.apache.org/transports/xmpp/pubsub">
         <jaxws:features>
-        	<bean class="org.apache.cxf.transport.xmpp.pubsub.PubSubServiceNameNode"/>
+        	<bean class="org.apache.cxf.transport.xmpp.pubsub.PubSubFixedNameNode">
+        		<property name="nodeName" value="DemoNode"/>
+        	</bean>
         </jaxws:features>
     </jaxws:client>
 	

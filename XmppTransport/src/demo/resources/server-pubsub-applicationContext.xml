@@ -42,7 +42,9 @@
 		transportId="http://cxf.apache.org/transports/xmpp/pubsub"
 		implementor="test.xmpp.service.HelloWorldService">
 		<jaxws:features>
-        	<bean class="org.apache.cxf.transport.xmpp.pubsub.PubSubServiceNameNode"/>
+        	<bean class="org.apache.cxf.transport.xmpp.pubsub.PubSubFixedNameNode">
+        		<property name="nodeName" value="DemoNode"/>
+        	</bean>
         </jaxws:features>
 	</jaxws:endpoint>
 

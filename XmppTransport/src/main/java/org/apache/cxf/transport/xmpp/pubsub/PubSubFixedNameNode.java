@@ -21,14 +21,19 @@ import org.jivesoftware.smackx.pubsub.PubSubManager;
 import org.jivesoftware.smackx.pubsub.Subscription;
 import org.jivesoftware.smackx.pubsub.listener.ItemEventListener;
 
-public class PubSubServiceNameNode extends AbstractFeature {
+public class PubSubFixedNameNode extends AbstractFeature {
     
-    private static final Logger LOGGER = LogUtils.getLogger(PubSubServiceNameNode.class);
+    private static final Logger LOGGER = LogUtils.getLogger(PubSubFixedNameNode.class);
     
     private boolean createIfMissing = true;
+    private String nodeName;
     
     public void setCreateIfMissing(boolean create) {
         createIfMissing = create;
+    }
+    
+    public void setNodeName(String name) {
+       nodeName = name;
     }
    
     @Override
@@ -42,16 +47,14 @@ public class PubSubServiceNameNode extends AbstractFeature {
         Destination dest = server.getDestination();
         
         if (dest instanceof XMPPConnectionUser && dest instanceof ItemEventListener<?>) {
-            //String serviceName = server.getEndpoint().getBinding().getBindingInfo().getName().toString();
-            String serviceName = server.getEndpoint().getService().getName().toString();
-            LOGGER.log(Level.INFO, "Node name for server destination: "+serviceName);
+            LOGGER.log(Level.INFO, "Node name for server destination: "+nodeName);
             XMPPConnectionUser connUser = (XMPPConnectionUser)dest;
             XMPPConnection connection = connUser.getXmppConnection();
             
-            Node pubSubNode = findOrCreateNode(serviceName, connection);
+            Node pubSubNode = findOrCreateNode(nodeName, connection);
             
             if (pubSubNode != null) {
-                findOrCreateSubscription((ItemEventListener<?>)dest, serviceName, connection, pubSubNode);
+                findOrCreateSubscription((ItemEventListener<?>)dest, nodeName, connection, pubSubNode);
             }
         }
         else {
@@ -65,17 +68,11 @@ public class PubSubServiceNameNode extends AbstractFeature {
         Conduit conduit = client.getConduit();
         
         if (conduit instanceof XMPPConnectionUser && conduit instanceof PubSubClientConduit) {
-            //String serviceName = client.getEndpoint().getEndpointInfo().getName().toString();
-            String serviceName = client.getEndpoint().getService().getName().toString();
-            int index = serviceName.lastIndexOf("Service");
-            if (index > -1) {
-                serviceName = serviceName.substring(0, index);
-            }
-            LOGGER.log(Level.INFO, "Node name for client conduit: "+serviceName);
+            LOGGER.log(Level.INFO, "Node name for client conduit: "+nodeName);
             XMPPConnectionUser connUser = (XMPPConnectionUser)conduit;
             XMPPConnection connection = connUser.getXmppConnection();
             
-            Node pubSubNode = findOrCreateNode(serviceName, connection);
+            Node pubSubNode = findOrCreateNode(nodeName, connection);
             
             if (pubSubNode instanceof LeafNode) {
                 ((PubSubClientConduit)conduit).setNode((LeafNode)pubSubNode);
