@@ -31,8 +31,8 @@
     	<property name="connectionFactory">
     		<bean class="org.apache.cxf.transport.xmpp.connection.BasicConnectionFactory">
 		    	<property name="xmppServiceName" value="localhost.localdomain"/>
-		    	<property name="xmppUsername" value="user1"/>
-		    	<property name="xmppPassword" value="user1"/>			
+		    	<property name="xmppUsername" value="service1"/>
+		    	<property name="xmppPassword" value="service1"/>			
 			</bean>
     	</property>
     </bean>
