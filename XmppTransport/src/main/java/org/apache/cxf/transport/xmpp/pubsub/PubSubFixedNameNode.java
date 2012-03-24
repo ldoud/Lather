@@ -54,7 +54,7 @@ public class PubSubFixedNameNode extends AbstractFeature {
             Node pubSubNode = findOrCreateNode(nodeName, connection);
             
             if (pubSubNode != null) {
-                findOrCreateSubscription((ItemEventListener<?>)dest, nodeName, connection, pubSubNode);
+                findOrCreateSubscription((ItemEventListener<?>)dest, connection, pubSubNode);
             }
         }
         else {
@@ -86,14 +86,15 @@ public class PubSubFixedNameNode extends AbstractFeature {
         }
     }
 
-    private void findOrCreateSubscription(ItemEventListener<?> listener, String serviceName, XMPPConnection connection,
+    private void findOrCreateSubscription(ItemEventListener<?> listener, XMPPConnection connection,
                                           Node pubSubNode) {
         try {
+            String userName = connection.getUser();
             List<Subscription> subscriptions = pubSubNode.getSubscriptions();
             boolean alreadySubscribed = false;
             for(Iterator<Subscription> i = subscriptions.iterator(); i.hasNext() && !alreadySubscribed;) {
                 Subscription sub = i.next();
-                alreadySubscribed = sub.getJid().equals(connection.getUser());
+                alreadySubscribed = sub.getJid().equals(userName);
             }
             
             pubSubNode.addItemEventListener(listener);
@@ -101,9 +102,9 @@ public class PubSubFixedNameNode extends AbstractFeature {
             if (!alreadySubscribed) {
                 try {
                     LOGGER.log(Level.INFO, "Creating subscription for destination");
-                    pubSubNode.subscribe(connection.getUser());
+                    pubSubNode.subscribe(userName);
                 } catch (XMPPException failedToSub) {
-                    LOGGER.log(Level.SEVERE, "JID: "+connection.getUser()+ " to node: "+serviceName);
+                    LOGGER.log(Level.SEVERE, "JID: "+userName+ " to node: "+pubSubNode.getId());
                 }
             }
             else {
@@ -111,7 +112,7 @@ public class PubSubFixedNameNode extends AbstractFeature {
             }
             
         } catch (XMPPException failedToGetSubscriptions) {
-           LOGGER.log(Level.SEVERE, "Failed to find subscriptions for: "+serviceName);
+           LOGGER.log(Level.SEVERE, "Failed to find subscriptions for node: "+pubSubNode.getId());
         }
     }
 
