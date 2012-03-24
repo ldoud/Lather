@@ -17,11 +17,11 @@
  * under the License.
  */
 
-package test.xmpp.server;
+package org.apache.cxf.transport.xmpp.iq;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class IQServer {
+public class Server {
     public static void main(String[] args) throws Exception {
         new ClassPathXmlApplicationContext("server-iq-applicationContext.xml");
         Thread.sleep(30 * 60 * 1000);

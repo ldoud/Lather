@@ -17,14 +17,14 @@
  * under the License.
  */
 
-package test.xmpp.client;
+package org.apache.cxf.transport.xmpp.iq;
 
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import test.xmpp.service.HelloWorld;
 
-public class TestCxfClient {
+public class Client {
     public static void main(String[] args) {
         ApplicationContext context = new ClassPathXmlApplicationContext("client-iq-applicationContext.xml");
         HelloWorld client = (HelloWorld)context.getBean("helloClient");

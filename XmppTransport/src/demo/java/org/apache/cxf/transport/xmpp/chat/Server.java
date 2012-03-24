@@ -17,11 +17,11 @@
  * under the License.
  */
 
-package test.xmpp.server;
+package org.apache.cxf.transport.xmpp.chat;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class ChatServer {
+public class Server {
     public static void main(String[] args) throws Exception {
         new ClassPathXmlApplicationContext("server-chat-applicationContext.xml");
         Thread.sleep(30 * 60 * 1000);

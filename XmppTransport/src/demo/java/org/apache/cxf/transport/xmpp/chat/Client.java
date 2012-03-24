@@ -17,7 +17,7 @@
  * under the License.
  */
 
-package test.xmpp.client;
+package org.apache.cxf.transport.xmpp.chat;
 
 import org.apache.cxf.transport.xmpp.smackx.soap.SoapPacket;
 import org.apache.cxf.transport.xmpp.smackx.soap.SoapProvider;
@@ -27,7 +27,7 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 import org.jivesoftware.smack.provider.ProviderManager;
 
-public class TestClient implements PacketListener {
+public class Client implements PacketListener {
     private static String message = "<soap:Envelope xmlns:soap=\"http://www.w3.org/2003/05/soap-envelope\">"
                                     + "<soap:Body>" + "<test:sayHi xmlns:test='http://service.xmpp.test/'>"
                                     + "        <arg0>World</arg0>" + "</test:sayHi>" + "</soap:Body>"
@@ -35,7 +35,7 @@ public class TestClient implements PacketListener {
 
     private String prefix;
 
-    public TestClient(String prefix) {
+    public Client(String prefix) {
         this.prefix = prefix;
     }
 
@@ -55,7 +55,7 @@ public class TestClient implements PacketListener {
         ProviderManager.getInstance().addIQProvider("Envelope", "http://www.w3.org/2003/05/soap-envelope",
                                                     new SoapProvider());
 
-        xmppConnection.addPacketListener(new TestClient("Received"), new PacketFilter() {
+        xmppConnection.addPacketListener(new Client("Received"), new PacketFilter() {
             @Override
             public boolean accept(Packet arg0) {
                 // TODO Auto-generated method stub
@@ -63,7 +63,7 @@ public class TestClient implements PacketListener {
             }
         });
 
-        xmppConnection.addPacketSendingListener(new TestClient("Sent"), new PacketFilter() {
+        xmppConnection.addPacketSendingListener(new Client("Sent"), new PacketFilter() {
             @Override
             public boolean accept(Packet arg0) {
                 // TODO Auto-generated method stub
