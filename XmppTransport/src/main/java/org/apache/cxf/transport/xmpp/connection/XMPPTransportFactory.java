@@ -21,6 +21,7 @@ package org.apache.cxf.transport.xmpp.connection;
 
 public interface XMPPTransportFactory {
 
-    public void setConnectionFactory(XMPPConnectionFactory connFactory);
-    
+    public void setDestinationConnectionFactory(XMPPConnectionFactory connFactory);
+
+    public void setConduitConnectionFactory(XMPPConnectionFactory connFactory);
 }

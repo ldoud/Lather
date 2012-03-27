@@ -53,7 +53,8 @@ public class IQTransportFactory extends AbstractTransportFactory
     public static final List<String> DEFAULT_NAMESPACES = Arrays
     .asList("http://cxf.apache.org/transports/xmpp");
     
-    private XMPPConnectionFactory connectionFactory;
+    private XMPPConnectionFactory destinationConnectionFactory;
+    private XMPPConnectionFactory conduitConnectionFactory;
 
     public IQTransportFactory() throws XMPPException {
         super();
@@ -82,7 +83,7 @@ public class IQTransportFactory extends AbstractTransportFactory
         IQDestination dest = new IQDestination(endpointInfo);
         
         try {
-            dest.setXmppConnection(connectionFactory.login(endpointInfo));
+            dest.setXmppConnection(destinationConnectionFactory.login(endpointInfo));
         } catch (XMPPException e) {
            throw new IOException(e);
         }
@@ -108,7 +109,7 @@ public class IQTransportFactory extends AbstractTransportFactory
         IQClientConduit conduit = new IQClientConduit(endpointType);
         
         try {
-            conduit.setXmppConnection(connectionFactory.login(endpointInfo));
+            conduit.setXmppConnection(conduitConnectionFactory.login(endpointInfo));
         } catch (XMPPException e) {
            throw new IOException(e);
         }
@@ -117,7 +118,12 @@ public class IQTransportFactory extends AbstractTransportFactory
     }
 
     @Override
-    public void setConnectionFactory(XMPPConnectionFactory factory) {
-        connectionFactory = factory;
+    public void setDestinationConnectionFactory(XMPPConnectionFactory factory) {
+        destinationConnectionFactory = factory;
+    }
+    
+    @Override
+    public void setConduitConnectionFactory(XMPPConnectionFactory factory) {
+        conduitConnectionFactory = factory;
     }
 }

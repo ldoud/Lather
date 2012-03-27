@@ -35,7 +35,8 @@
     
     <bean class="org.apache.cxf.transport.xmpp.pubsub.PubSubTransportFactory">
     	<property name="bus" ref="cxf"/>
-    	<property name="connectionFactory" ref="connectionFactory"/>
+    	<property name="destinationConnectionFactory" ref="connectionFactory"/>
+    	<property name="conduitConnectionFactory" ref="connectionFactory"/>
     </bean>
 
 	<jaxws:endpoint 

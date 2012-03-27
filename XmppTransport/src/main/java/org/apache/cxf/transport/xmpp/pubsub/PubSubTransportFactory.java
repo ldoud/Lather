@@ -51,7 +51,8 @@ public class PubSubTransportFactory extends AbstractTransportFactory
     public static final List<String> DEFAULT_NAMESPACES = Arrays
     .asList("http://cxf.apache.org/transports/xmpp/pubsub");
     
-    private XMPPConnectionFactory connectionFactory;
+    private XMPPConnectionFactory destinationConnectionFactory;
+    private XMPPConnectionFactory conduitConnectionFactory;
 
     public PubSubTransportFactory() throws XMPPException {
         super();
@@ -73,7 +74,7 @@ public class PubSubTransportFactory extends AbstractTransportFactory
         PubSubDestination dest = new PubSubDestination(endpointInfo);
         
         try {
-            dest.setXmppConnection(connectionFactory.login(endpointInfo));
+            dest.setXmppConnection(destinationConnectionFactory.login(endpointInfo));
            
         } catch (XMPPException e) {
            throw new IOException(e);
@@ -100,7 +101,7 @@ public class PubSubTransportFactory extends AbstractTransportFactory
         PubSubClientConduit conduit = new PubSubClientConduit(endpointType);
         
         try {
-            conduit.setXmppConnection(connectionFactory.login(endpointInfo));
+            conduit.setXmppConnection(conduitConnectionFactory.login(endpointInfo));
         } catch (XMPPException e) {
            throw new IOException(e);
         }
@@ -109,7 +110,12 @@ public class PubSubTransportFactory extends AbstractTransportFactory
     }
 
     @Override
-    public void setConnectionFactory(XMPPConnectionFactory factory) {
-        connectionFactory = factory;
+    public void setDestinationConnectionFactory(XMPPConnectionFactory factory) {
+        destinationConnectionFactory = factory;
+    }
+    
+    @Override
+    public void setConduitConnectionFactory(XMPPConnectionFactory factory) {
+        conduitConnectionFactory = factory;
     }
 }
