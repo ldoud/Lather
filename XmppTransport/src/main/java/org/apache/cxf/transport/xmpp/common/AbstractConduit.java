@@ -17,7 +17,6 @@ public abstract class AbstractConduit implements Conduit, XMPPConnectionUser {
     
     // XMPP connection that might be shared with other destinations.
     private XMPPConnection connection;
-    private boolean sharedConnection;
 
     // Information about service being called.
     private EndpointReferenceType target;
@@ -37,21 +36,17 @@ public abstract class AbstractConduit implements Conduit, XMPPConnectionUser {
     }
 
     @Override
-    public void setXmppConnection(XMPPConnection conn, boolean shared) {
+    public void setXmppConnection(XMPPConnection conn) {
         connection = conn;
-        sharedConnection = shared;
     }
 
-    @Override
     public XMPPConnection getXmppConnection() {
         return connection;
     }
 
     @Override
     public void close() {
-        if (!sharedConnection && connection != null && connection.isConnected()) {
-            connection.disconnect();
-        }
+        // Nothing
     }
     
     @Override

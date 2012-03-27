@@ -19,25 +19,30 @@
 
 package org.apache.cxf.transport.xmpp.connection;
 
-import java.util.logging.Level;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.apache.cxf.Bus;
+import org.apache.cxf.buslifecycle.BusLifeCycleListener;
+import org.apache.cxf.buslifecycle.BusLifeCycleManager;
 import org.apache.cxf.common.logging.LogUtils;
 import org.apache.cxf.service.model.EndpointInfo;
-import org.apache.cxf.transport.xmpp.common.XMPPConnectionUser;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
-public class BasicConnectionFactory implements XMPPConnectionFactory {
+public class BasicConnectionFactory implements XMPPConnectionFactory, BusLifeCycleListener {
     private static final Logger LOGGER = LogUtils.getLogger(BasicConnectionFactory.class);
 
-    private XMPPConnection clientConnection;
+    private Map<String, XMPPConnection> connectionsKeyByResources = new HashMap<String, XMPPConnection>();
     
     // Configuration options used to connect to XMPP server.
     private String xmppServiceName;
     private String xmppUsername;
     private String xmppPassword;
+    
+    // Listen to this to shutdown connections.
+    private Bus bus;
     
     /**
      * Required configuration option for connecting to the XMPP server.
@@ -62,33 +67,48 @@ public class BasicConnectionFactory implements XMPPConnectionFactory {
     public void setXmppPassword(String xmppPassword) {
         this.xmppPassword = xmppPassword;
     }
-
-    @Override
-    public void loginDestination(XMPPConnectionUser dest, EndpointInfo epi, Bus bus) throws XMPPException {
-        String resourceName = epi.getService().getName().toString();
-        
-        XMPPConnection xmppConnection = new XMPPConnection(xmppServiceName);
-        xmppConnection.connect();
-        xmppConnection.login(xmppUsername, xmppPassword, resourceName);
-        LOGGER.info("Destination logged in with JID: "+xmppConnection.getUser());
-        
-        dest.setXmppConnection(xmppConnection, false);
+    
+    public void setBus(Bus listenForShutdown) {
+        bus = listenForShutdown;
+        BusLifeCycleManager mgr = bus.getExtension(BusLifeCycleManager.class);
+        mgr.registerLifeCycleListener(this);
     }
 
     @Override
-    public void loginConduit(XMPPConnectionUser conduit, EndpointInfo epi, Bus bus) throws XMPPException {
-        if (clientConnection == null) {
-            LOGGER.log(Level.INFO, "Creating conduit connection");
-            
-            String resourceName = "common-client-"+bus.getId();
-            XMPPConnection xmppConnection = new XMPPConnection(xmppServiceName);
+    public synchronized XMPPConnection login(EndpointInfo epi) throws XMPPException {
+        String resourceName = createResourceName(epi, bus);
+        XMPPConnection xmppConnection = connectionsKeyByResources.get(resourceName);
+       
+        if (xmppConnection == null) {
+            xmppConnection = new XMPPConnection(xmppServiceName);
             xmppConnection.connect();
             xmppConnection.login(xmppUsername, xmppPassword, resourceName);
-            
-            clientConnection = xmppConnection;
+            connectionsKeyByResources.put(resourceName, xmppConnection);
+            LOGGER.info("Logged in with JID: "+xmppConnection.getUser());
         }
-        
-        LOGGER.info("Client logged in with JID: "+clientConnection.getUser());
-        conduit.setXmppConnection(clientConnection, true);
+       
+        return xmppConnection;
     }
+    
+    protected String createResourceName(EndpointInfo epi, Bus bus) {
+        return epi.getService().getName().toString();
+    }
+
+    @Override
+    public void initComplete() {
+        // Nothing
+    }
+
+    @Override
+    public void postShutdown() {
+        for(XMPPConnection conn : connectionsKeyByResources.values()) {
+            conn.disconnect();
+        }
+    }
+
+    @Override
+    public void preShutdown() {
+        // Nothing        
+    }
+
 }

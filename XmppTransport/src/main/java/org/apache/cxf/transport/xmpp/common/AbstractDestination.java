@@ -34,7 +34,6 @@ public class AbstractDestination implements Destination, XMPPConnectionUser {
     
     // XMPP connection that might be shared with other destinations.
     private XMPPConnection connection;
-    private boolean sharedConnection;
     
     // Values initialized during construction.
     private EndpointReferenceType epRefType = new EndpointReferenceType();
@@ -64,9 +63,8 @@ public class AbstractDestination implements Destination, XMPPConnectionUser {
      * {@inheritDoc}
      */
     @Override
-    public void setXmppConnection(XMPPConnection conn, boolean isShared) {
+    public void setXmppConnection(XMPPConnection conn) {
         connection = conn;
-        sharedConnection = isShared;
     }
     
     /**
@@ -112,9 +110,7 @@ public class AbstractDestination implements Destination, XMPPConnectionUser {
      */
     @Override
     public void shutdown() {
-        if (!sharedConnection && connection != null && connection.isConnected()) {
-            connection.disconnect();
-        }
+        // Nothing
     }
 
 }

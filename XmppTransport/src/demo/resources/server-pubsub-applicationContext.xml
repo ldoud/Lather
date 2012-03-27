@@ -26,15 +26,16 @@
 
     <cxf:bus name="cxf"/>
     
+    <bean class="org.apache.cxf.transport.xmpp.connection.BasicConnectionFactory" name="connectionFactory">
+		<property name="xmppServiceName" value="localhost.localdomain"/>
+		<property name="xmppUsername" value="user1"/>
+		<property name="xmppPassword" value="user1"/>	
+		<property name="bus" ref="cxf"/>		
+	</bean>
+    
     <bean class="org.apache.cxf.transport.xmpp.pubsub.PubSubTransportFactory">
     	<property name="bus" ref="cxf"/>
-    	<property name="connectionFactory">
-    		<bean class="org.apache.cxf.transport.xmpp.connection.BasicConnectionFactory">
-		    	<property name="xmppServiceName" value="localhost.localdomain"/>
-		    	<property name="xmppUsername" value="service1"/>
-		    	<property name="xmppPassword" value="service1"/>			
-			</bean>
-    	</property>
+    	<property name="connectionFactory" ref="connectionFactory"/>
     </bean>
 
 	<jaxws:endpoint 
@@ -44,6 +45,7 @@
 		<jaxws:features>
         	<bean class="org.apache.cxf.transport.xmpp.pubsub.PubSubFixedNameNode">
         		<property name="nodeName" value="DemoNode"/>
+        		<property name="connectionFactory" ref="connectionFactory"/>
         	</bean>
         </jaxws:features>
 	</jaxws:endpoint>

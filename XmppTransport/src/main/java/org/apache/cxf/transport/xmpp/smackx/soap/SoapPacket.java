@@ -20,9 +20,8 @@
 package org.apache.cxf.transport.xmpp.smackx.soap;
 
 import org.jivesoftware.smack.packet.IQ;
-import org.jivesoftware.smack.packet.PacketExtension;
 
-public class SoapPacket extends IQ implements PacketExtension{
+public class SoapPacket extends IQ {
     private String soapEnvelope;
 
     /**
@@ -47,21 +46,4 @@ public class SoapPacket extends IQ implements PacketExtension{
         return soapEnvelope;
     }
 
-    /**
-     * {@inheritDoc}
-     * @see PacketExtension
-     */
-    @Override
-    public String getElementName() {
-        return "Envelope";
-    }
-
-    /**
-     * {@inheritDoc}
-     * @see PacketExtension
-     */
-    @Override
-    public String getNamespace() {
-        return getXmlns();
-    }
 }

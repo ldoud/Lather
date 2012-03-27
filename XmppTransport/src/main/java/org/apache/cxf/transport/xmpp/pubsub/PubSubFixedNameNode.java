@@ -12,7 +12,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.feature.AbstractFeature;
 import org.apache.cxf.transport.Conduit;
 import org.apache.cxf.transport.Destination;
-import org.apache.cxf.transport.xmpp.common.XMPPConnectionUser;
+import org.apache.cxf.transport.xmpp.connection.XMPPConnectionFactory;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smackx.pubsub.LeafNode;
@@ -27,9 +27,14 @@ public class PubSubFixedNameNode extends AbstractFeature {
     
     private boolean createIfMissing = true;
     private String nodeName;
+    private XMPPConnectionFactory connectionFactory;
     
     public void setCreateIfMissing(boolean create) {
         createIfMissing = create;
+    }
+    
+    public void setConnectionFactory(XMPPConnectionFactory factory) {
+        connectionFactory = factory;
     }
     
     public void setNodeName(String name) {
@@ -45,44 +50,47 @@ public class PubSubFixedNameNode extends AbstractFeature {
     @Override
     public void initialize(Server server, Bus bus) {
         Destination dest = server.getDestination();
-        
-        if (dest instanceof XMPPConnectionUser && dest instanceof ItemEventListener<?>) {
-            LOGGER.log(Level.INFO, "Node name for server destination: "+nodeName);
-            XMPPConnectionUser connUser = (XMPPConnectionUser)dest;
-            XMPPConnection connection = connUser.getXmppConnection();
-            
-            Node pubSubNode = findOrCreateNode(nodeName, connection);
-            
-            if (pubSubNode != null) {
-                findOrCreateSubscription((ItemEventListener<?>)dest, connection, pubSubNode);
+        try {
+            if (dest instanceof ItemEventListener<?>) {
+                LOGGER.log(Level.INFO, "Node name for server destination: "+nodeName);
+                
+                XMPPConnection connection = connectionFactory.login(server.getEndpoint().getEndpointInfo());
+                Node pubSubNode = findOrCreateNode(nodeName, connection);
+                
+                if (pubSubNode != null) {
+                    findOrCreateSubscription((ItemEventListener<?>)dest, connection, pubSubNode);
+                }
             }
-        }
-        else {
-            LOGGER.log(Level.WARNING, "This feature is only for PubSubDestinations");
+            else {
+                LOGGER.log(Level.WARNING, "This feature is only for PubSubDestinations");
+            }
+        } catch (XMPPException e) {
+            LOGGER.log(Level.SEVERE, "Failed to create node: "+nodeName, e);
         }
     }
     
-    
     @Override
     public void initialize(Client client, Bus bus) {
-        Conduit conduit = client.getConduit();
-        
-        if (conduit instanceof XMPPConnectionUser && conduit instanceof PubSubClientConduit) {
-            LOGGER.log(Level.INFO, "Node name for client conduit: "+nodeName);
-            XMPPConnectionUser connUser = (XMPPConnectionUser)conduit;
-            XMPPConnection connection = connUser.getXmppConnection();
-            
-            Node pubSubNode = findOrCreateNode(nodeName, connection);
-            
-            if (pubSubNode instanceof LeafNode) {
-                ((PubSubClientConduit)conduit).setNode((LeafNode)pubSubNode);
+        Conduit conduit = client.getConduit();        
+        try {
+            if (conduit instanceof PubSubClientConduit) {
+                LOGGER.log(Level.INFO, "Node name for client conduit: "+nodeName);
+                
+                XMPPConnection connection = connectionFactory.login(client.getEndpoint().getEndpointInfo());
+                Node pubSubNode = findOrCreateNode(nodeName, connection);
+                
+                if (pubSubNode instanceof LeafNode) {
+                    ((PubSubClientConduit)conduit).setNode((LeafNode)pubSubNode);
+                }
+                else {
+                    LOGGER.log(Level.SEVERE, "Node cannot be used to published items");
+                }
             }
             else {
-                LOGGER.log(Level.SEVERE, "Node cannot be used to published items");
+                LOGGER.log(Level.WARNING, "This feature is only for PubSubDestinations");
             }
-        }
-        else {
-            LOGGER.log(Level.WARNING, "This feature is only for PubSubDestinations");
+        } catch (XMPPException e) {
+            LOGGER.log(Level.SEVERE, "Failed to create node: "+nodeName, e);
         }
     }
 

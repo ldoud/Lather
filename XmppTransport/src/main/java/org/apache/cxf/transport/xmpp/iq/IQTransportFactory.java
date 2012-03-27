@@ -82,7 +82,7 @@ public class IQTransportFactory extends AbstractTransportFactory
         IQDestination dest = new IQDestination(endpointInfo);
         
         try {
-            connectionFactory.loginDestination(dest, endpointInfo, bus);
+            dest.setXmppConnection(connectionFactory.login(endpointInfo));
         } catch (XMPPException e) {
            throw new IOException(e);
         }
@@ -108,7 +108,7 @@ public class IQTransportFactory extends AbstractTransportFactory
         IQClientConduit conduit = new IQClientConduit(endpointType);
         
         try {
-            connectionFactory.loginConduit(conduit, endpointInfo, bus);
+            conduit.setXmppConnection(connectionFactory.login(endpointInfo));
         } catch (XMPPException e) {
            throw new IOException(e);
         }

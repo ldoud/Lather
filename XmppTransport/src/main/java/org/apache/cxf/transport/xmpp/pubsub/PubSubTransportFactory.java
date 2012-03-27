@@ -73,7 +73,8 @@ public class PubSubTransportFactory extends AbstractTransportFactory
         PubSubDestination dest = new PubSubDestination(endpointInfo);
         
         try {
-            connectionFactory.loginDestination(dest, endpointInfo, bus);
+            dest.setXmppConnection(connectionFactory.login(endpointInfo));
+           
         } catch (XMPPException e) {
            throw new IOException(e);
         }
@@ -99,7 +100,7 @@ public class PubSubTransportFactory extends AbstractTransportFactory
         PubSubClientConduit conduit = new PubSubClientConduit(endpointType);
         
         try {
-            connectionFactory.loginConduit(conduit, endpointInfo, bus);
+            conduit.setXmppConnection(connectionFactory.login(endpointInfo));
         } catch (XMPPException e) {
            throw new IOException(e);
         }

@@ -47,15 +47,14 @@ public class IQClientConduit extends AbstractConduit implements PacketListener {
     // Messages sent to the service are stored in this table based on
     // their PacketId so they can be retrieved when a response is received.
     private AbstractMap<String, Exchange> exchangeCorrelationTable = new HashMap<String, Exchange>();
-
+    
     public IQClientConduit(EndpointReferenceType target) {
         super(target);
     }
 
     @Override
-    public void setXmppConnection(XMPPConnection newConnection, boolean shared) {
-        super.setXmppConnection(newConnection, shared);
-        
+    public void setXmppConnection(XMPPConnection newConnection) {
+        super.setXmppConnection(newConnection);
         newConnection.addPacketListener(this, new PacketFilter() {
             @Override
             public boolean accept(Packet anyPacket) {
@@ -101,7 +100,6 @@ public class IQClientConduit extends AbstractConduit implements PacketListener {
      */
     @Override
     public void processPacket(Packet xmppResponse) {
-        // TODO Is there a better input stream than ByteArrayInputStream?
         Message responseMsg = new MessageImpl();
         SoapPacket soapMsg = (SoapPacket)xmppResponse;
         responseMsg.setContent(InputStream.class, new ByteArrayInputStream(soapMsg.getChildElementXML()

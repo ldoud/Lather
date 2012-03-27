@@ -31,8 +31,6 @@ public interface XMPPConnectionUser {
      * Therefore the factory should not be used until the server is started.
      * @param factory Factory that is used for creating connections.
      */
-    public void setXmppConnection(XMPPConnection conn, boolean shared);
+    public void setXmppConnection(XMPPConnection conn);
     
-    
-    public XMPPConnection getXmppConnection();
 }

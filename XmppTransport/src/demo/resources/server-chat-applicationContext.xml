@@ -28,9 +28,9 @@
 		http://cxf.apache.org/simple http://cxf.apache.org/schemas/simple.xsd
 ">
 
-    <cxf:bus bus="cxf"/>
+    <cxf:bus name="cxf"/>
     
-    <bean class="org.apache.cxf.transport.xmpp.chat.IQTransportFactory">
+    <bean class="org.apache.cxf.transport.xmpp.chat.XMPPTransportFactory">
     	<property name="bus" ref="cxf"/>
     </bean>
 

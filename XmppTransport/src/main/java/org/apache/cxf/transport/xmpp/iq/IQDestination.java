@@ -47,8 +47,8 @@ public class IQDestination extends AbstractDestination implements PacketListener
     }
     
     @Override
-    public void setXmppConnection(XMPPConnection newConnection, boolean isShared) {
-        super.setXmppConnection(newConnection, isShared);
+    public void setXmppConnection(XMPPConnection newConnection) {
+        super.setXmppConnection(newConnection);
 
         newConnection.addPacketListener(this, new PacketFilter() {
             @Override

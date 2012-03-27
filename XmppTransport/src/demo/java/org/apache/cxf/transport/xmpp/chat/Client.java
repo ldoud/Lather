@@ -72,7 +72,7 @@ public class Client implements PacketListener {
         });
 
         SoapPacket iqPacket = new SoapPacket();
-        iqPacket.setTo("service1@localhost.localdomain/{http://service.xmpp.test/}HelloWorldServicePort");
+        iqPacket.setTo("service1@localhost.localdomain/{http://service.xmpp.test/}HelloWorld");
         iqPacket.setEnvelope(message);
         xmppConnection.sendPacket(iqPacket);
 
