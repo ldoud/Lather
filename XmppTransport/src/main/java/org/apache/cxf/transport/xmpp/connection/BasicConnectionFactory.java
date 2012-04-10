@@ -93,7 +93,7 @@ public class BasicConnectionFactory implements XMPPConnectionFactory, BusLifeCyc
         return xmppConnection;
     }
 
-    protected String createResourceName(EndpointInfo epi, Bus bus) {
+    protected String createResourceName(EndpointInfo epi, Bus theBus) {
         return epi.getService().getName().toString();
     }
 

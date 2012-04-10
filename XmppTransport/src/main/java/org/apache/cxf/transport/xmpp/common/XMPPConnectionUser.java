@@ -32,6 +32,6 @@ public interface XMPPConnectionUser {
      * 
      * @param factory Factory that is used for creating connections.
      */
-    public void setXmppConnection(XMPPConnection conn);
+    void setXmppConnection(XMPPConnection conn);
 
 }

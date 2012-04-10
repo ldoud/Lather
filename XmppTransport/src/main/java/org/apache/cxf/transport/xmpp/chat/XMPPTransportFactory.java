@@ -44,10 +44,10 @@ import org.jivesoftware.smack.XMPPException;
  */
 public class XMPPTransportFactory extends AbstractTransportFactory implements DestinationFactory {
 
-    private static final Logger LOGGER = LogUtils.getLogger(XMPPTransportFactory.class);
-
     public static final List<String> DEFAULT_NAMESPACES = Arrays
-        .asList("http://cxf.apache.org/transports/xmpp");
+    .asList("http://cxf.apache.org/transports/xmpp");
+    
+    private static final Logger LOGGER = LogUtils.getLogger(XMPPTransportFactory.class);
 
     // TODO Make these configurable.
     private String serviceName = "localhost.localdomain";

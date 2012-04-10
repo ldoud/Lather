@@ -35,5 +35,5 @@ public interface XMPPConnectionFactory {
      * @return A connection that might be shared, so don't close it.
      * @throws XMPPException If the login fails.
      */
-    public XMPPConnection login(EndpointInfo epi) throws XMPPException;
+    XMPPConnection login(EndpointInfo epi) throws XMPPException;
 }
