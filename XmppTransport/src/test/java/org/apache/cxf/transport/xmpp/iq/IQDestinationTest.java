@@ -99,7 +99,7 @@ public class IQDestinationTest {
     }
 
     @Test
-    public void testXmppConnectionWasClosed() {
+    public void testXmppConnectionWasNotClosed() {
         EndpointInfo info = new EndpointInfo();
         info.setAddress("test-address");
 
@@ -107,20 +107,9 @@ public class IQDestinationTest {
         destination.setXmppConnection(fakeXmppConnection);
         destination.shutdown();
 
-        Assert.assertEquals("XMPP connection was closed", true, testDisconnectedWasCalled);
+        Assert.assertEquals("XMPP connection was closed", false, testDisconnectedWasCalled);
     }
 
-    @Test
-    public void testXmppConnectionWasNotClosed() {
-        EndpointInfo info = new EndpointInfo();
-        info.setAddress("test-address");
-
-        IQDestination destination = new IQDestination(info);
-        destination.shutdown();
-
-        Assert
-            .assertEquals("Did not attempt to close null XMPP connection", false, testDisconnectedWasCalled);
-    }
 
     @Test
     public void testEndPointAddressIsSaved() {
