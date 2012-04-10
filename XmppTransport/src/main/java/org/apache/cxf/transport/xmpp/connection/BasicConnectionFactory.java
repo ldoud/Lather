@@ -35,17 +35,18 @@ public class BasicConnectionFactory implements XMPPConnectionFactory, BusLifeCyc
     private static final Logger LOGGER = LogUtils.getLogger(BasicConnectionFactory.class);
 
     private Map<String, XMPPConnection> connectionsKeyByResources = new HashMap<String, XMPPConnection>();
-    
+
     // Configuration options used to connect to XMPP server.
     private String xmppServiceName;
     private String xmppUsername;
     private String xmppPassword;
-    
+
     // Listen to this to shutdown connections.
     private Bus bus;
-    
+
     /**
      * Required configuration option for connecting to the XMPP server.
+     * 
      * @param xmppServiceName The full name of the XMPP server.
      */
     public void setXmppServiceName(String xmppServiceName) {
@@ -54,6 +55,7 @@ public class BasicConnectionFactory implements XMPPConnectionFactory, BusLifeCyc
 
     /**
      * Required configuration option for connecting to the XMPP server.
+     * 
      * @param xmppUsername The username for the XMPP connection.
      */
     public void setXmppUsername(String xmppUsername) {
@@ -62,12 +64,13 @@ public class BasicConnectionFactory implements XMPPConnectionFactory, BusLifeCyc
 
     /**
      * Required configuration option for connecting to the XMPP server.
+     * 
      * @param xmppPassword The password for the XMPP connection.
      */
     public void setXmppPassword(String xmppPassword) {
         this.xmppPassword = xmppPassword;
     }
-    
+
     public void setBus(Bus listenForShutdown) {
         bus = listenForShutdown;
         BusLifeCycleManager mgr = bus.getExtension(BusLifeCycleManager.class);
@@ -78,18 +81,18 @@ public class BasicConnectionFactory implements XMPPConnectionFactory, BusLifeCyc
     public synchronized XMPPConnection login(EndpointInfo epi) throws XMPPException {
         String resourceName = createResourceName(epi, bus);
         XMPPConnection xmppConnection = connectionsKeyByResources.get(resourceName);
-       
+
         if (xmppConnection == null) {
             xmppConnection = new XMPPConnection(xmppServiceName);
             xmppConnection.connect();
             xmppConnection.login(xmppUsername, xmppPassword, resourceName);
             connectionsKeyByResources.put(resourceName, xmppConnection);
-            LOGGER.info("Logged in with JID: "+xmppConnection.getUser());
+            LOGGER.info("Logged in with JID: " + xmppConnection.getUser());
         }
-       
+
         return xmppConnection;
     }
-    
+
     protected String createResourceName(EndpointInfo epi, Bus bus) {
         return epi.getService().getName().toString();
     }
@@ -101,14 +104,14 @@ public class BasicConnectionFactory implements XMPPConnectionFactory, BusLifeCyc
 
     @Override
     public void postShutdown() {
-        for(XMPPConnection conn : connectionsKeyByResources.values()) {
+        for (XMPPConnection conn : connectionsKeyByResources.values()) {
             conn.disconnect();
         }
     }
 
     @Override
     public void preShutdown() {
-        // Nothing        
+        // Nothing
     }
 
 }

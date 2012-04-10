@@ -31,16 +31,16 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.jivesoftware.smack.XMPPConnection;
 
 public class AbstractDestination implements Destination, XMPPConnectionUser {
-    
+
     // XMPP connection that might be shared with other destinations.
     private XMPPConnection connection;
-    
+
     // Values initialized during construction.
     private EndpointReferenceType epRefType = new EndpointReferenceType();
 
     // After messages are received they are passed to this observer.
     private MessageObserver msgObserver;
-    
+
     public AbstractDestination(EndpointInfo epInfo) {
         // Initialize the address of the epRefType member.
         AttributedURIType address = new AttributedURIType();
@@ -50,6 +50,7 @@ public class AbstractDestination implements Destination, XMPPConnectionUser {
 
     /**
      * Required by the Destination interface.
+     * 
      * @see org.apache.cxf.transport.Destination
      */
     @Override
@@ -59,14 +60,14 @@ public class AbstractDestination implements Destination, XMPPConnectionUser {
 
     /**
      * Save the information to handle shutdown of non-shared connection.
-     * @see XMPPConnectionUser
-     * {@inheritDoc}
+     * 
+     * @see XMPPConnectionUser {@inheritDoc}
      */
     @Override
     public void setXmppConnection(XMPPConnection conn) {
         connection = conn;
     }
-    
+
     /**
      * {@inheritDoc}
      */
@@ -76,6 +77,7 @@ public class AbstractDestination implements Destination, XMPPConnectionUser {
 
     /**
      * Required by the Destination interface.
+     * 
      * @see org.apache.cxf.transport.Destination
      */
     @Override
@@ -86,6 +88,7 @@ public class AbstractDestination implements Destination, XMPPConnectionUser {
     /**
      * Not used. The back channel is set on the exchange of the message when the message is received. Required
      * by the Destination interface.
+     * 
      * @see org.apache.cxf.transport.Destination
      */
     @Override
@@ -96,6 +99,7 @@ public class AbstractDestination implements Destination, XMPPConnectionUser {
 
     /**
      * Required by the Destination interface.
+     * 
      * @see org.apache.cxf.transport.Destination
      */
     @Override
@@ -105,8 +109,8 @@ public class AbstractDestination implements Destination, XMPPConnectionUser {
 
     /**
      * Close the connection if its not shared.
-     * @see org.apache.cxf.transport.Destination
-     * {@inheritDoc}
+     * 
+     * @see org.apache.cxf.transport.Destination {@inheritDoc}
      */
     @Override
     public void shutdown() {

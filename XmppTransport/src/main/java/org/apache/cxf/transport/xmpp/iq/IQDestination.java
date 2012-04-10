@@ -45,7 +45,7 @@ public class IQDestination extends AbstractDestination implements PacketListener
     public IQDestination(EndpointInfo epInfo) {
         super(epInfo);
     }
-    
+
     @Override
     public void setXmppConnection(XMPPConnection newConnection) {
         super.setXmppConnection(newConnection);

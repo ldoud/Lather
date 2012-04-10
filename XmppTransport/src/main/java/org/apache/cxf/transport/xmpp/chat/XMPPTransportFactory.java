@@ -43,9 +43,9 @@ import org.jivesoftware.smack.XMPPException;
  * @author Leon Doud
  */
 public class XMPPTransportFactory extends AbstractTransportFactory implements DestinationFactory {
-    
+
     private static final Logger LOGGER = LogUtils.getLogger(XMPPTransportFactory.class);
-    
+
     public static final List<String> DEFAULT_NAMESPACES = Arrays
         .asList("http://cxf.apache.org/transports/xmpp");
 
@@ -69,15 +69,15 @@ public class XMPPTransportFactory extends AbstractTransportFactory implements De
      */
     public Destination getDestination(EndpointInfo endpointInfo) throws IOException {
         XMPPDestination dest = new XMPPDestination(endpointInfo);
-        
+
         try {
             String resource = endpointInfo.getService().getName().toString();
-            
+
             XMPPConnection xmppConnection = new XMPPConnection(serviceName);
             xmppConnection.connect();
             xmppConnection.login(username, password, resource);
-            LOGGER.info("Connected using jid: "+xmppConnection.getUser());
-            
+            LOGGER.info("Connected using jid: " + xmppConnection.getUser());
+
             dest.setConnection(xmppConnection);
         } catch (XMPPException e) {
             LOGGER.log(Level.SEVERE, "Unable to connect");

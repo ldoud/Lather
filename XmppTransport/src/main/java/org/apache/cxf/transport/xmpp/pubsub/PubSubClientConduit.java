@@ -13,13 +13,13 @@ import org.jivesoftware.smackx.pubsub.PayloadItem;
 import org.jivesoftware.smackx.pubsub.SimplePayload;
 
 public class PubSubClientConduit extends AbstractConduit {
-    
+
     private LeafNode targetNode;
-    
+
     public PubSubClientConduit(EndpointReferenceType type) {
         super(type);
     }
-    
+
     public void setNode(LeafNode node) {
         targetNode = node;
     }
@@ -29,16 +29,17 @@ public class PubSubClientConduit extends AbstractConduit {
         super.prepare(msg);
         msg.getExchange().setOneWay(true);
     }
-    
+
     @Override
     public void close(Message msg) throws IOException {
         CachedOutputStream output = (CachedOutputStream)msg.getContent(OutputStream.class);
         if (targetNode != null && output != null) {
             StringBuilder soapEnvelope = new StringBuilder();
             output.writeCacheTo(soapEnvelope);
-            
-            SimplePayload payload = new SimplePayload("Envelope", "http://www.w3.org/2003/05/soap-envelope", soapEnvelope.toString());
-            
+
+            SimplePayload payload = new SimplePayload("Envelope", "http://www.w3.org/2003/05/soap-envelope",
+                                                      soapEnvelope.toString());
+
             PayloadItem<SimplePayload> pi = new PayloadItem<SimplePayload>(payload);
             try {
                 targetNode.send(pi);

@@ -22,75 +22,72 @@ import org.jivesoftware.smackx.pubsub.Subscription;
 import org.jivesoftware.smackx.pubsub.listener.ItemEventListener;
 
 public class PubSubFixedNameNode extends AbstractFeature {
-    
+
     private static final Logger LOGGER = LogUtils.getLogger(PubSubFixedNameNode.class);
-    
+
     private boolean createIfMissing = true;
     private String nodeName;
     private XMPPConnectionFactory connectionFactory;
-    
+
     public void setCreateIfMissing(boolean create) {
         createIfMissing = create;
     }
-    
+
     public void setConnectionFactory(XMPPConnectionFactory factory) {
         connectionFactory = factory;
     }
-    
+
     public void setNodeName(String name) {
-       nodeName = name;
+        nodeName = name;
     }
-   
+
     @Override
     public void initialize(Bus bus) {
         // Doesn't work on a bus
         LOGGER.log(Level.WARNING, "This feature isn't for a bus");
     }
-    
+
     @Override
     public void initialize(Server server, Bus bus) {
         Destination dest = server.getDestination();
         try {
             if (dest instanceof ItemEventListener<?>) {
-                LOGGER.log(Level.INFO, "Node name for server destination: "+nodeName);
-                
+                LOGGER.log(Level.INFO, "Node name for server destination: " + nodeName);
+
                 XMPPConnection connection = connectionFactory.login(server.getEndpoint().getEndpointInfo());
                 Node pubSubNode = findOrCreateNode(nodeName, connection);
-                
+
                 if (pubSubNode != null) {
                     findOrCreateSubscription((ItemEventListener<?>)dest, connection, pubSubNode);
                 }
-            }
-            else {
+            } else {
                 LOGGER.log(Level.WARNING, "This feature is only for PubSubDestinations");
             }
         } catch (XMPPException e) {
-            LOGGER.log(Level.SEVERE, "Failed to create node: "+nodeName, e);
+            LOGGER.log(Level.SEVERE, "Failed to create node: " + nodeName, e);
         }
     }
-    
+
     @Override
     public void initialize(Client client, Bus bus) {
-        Conduit conduit = client.getConduit();        
+        Conduit conduit = client.getConduit();
         try {
             if (conduit instanceof PubSubClientConduit) {
-                LOGGER.log(Level.INFO, "Node name for client conduit: "+nodeName);
-                
+                LOGGER.log(Level.INFO, "Node name for client conduit: " + nodeName);
+
                 XMPPConnection connection = connectionFactory.login(client.getEndpoint().getEndpointInfo());
                 Node pubSubNode = findOrCreateNode(nodeName, connection);
-                
+
                 if (pubSubNode instanceof LeafNode) {
                     ((PubSubClientConduit)conduit).setNode((LeafNode)pubSubNode);
-                }
-                else {
+                } else {
                     LOGGER.log(Level.SEVERE, "Node cannot be used to published items");
                 }
-            }
-            else {
+            } else {
                 LOGGER.log(Level.WARNING, "This feature is only for PubSubDestinations");
             }
         } catch (XMPPException e) {
-            LOGGER.log(Level.SEVERE, "Failed to create node: "+nodeName, e);
+            LOGGER.log(Level.SEVERE, "Failed to create node: " + nodeName, e);
         }
     }
 
@@ -100,27 +97,26 @@ public class PubSubFixedNameNode extends AbstractFeature {
             String userName = connection.getUser();
             List<Subscription> subscriptions = pubSubNode.getSubscriptions();
             boolean alreadySubscribed = false;
-            for(Iterator<Subscription> i = subscriptions.iterator(); i.hasNext() && !alreadySubscribed;) {
+            for (Iterator<Subscription> i = subscriptions.iterator(); i.hasNext() && !alreadySubscribed;) {
                 Subscription sub = i.next();
                 alreadySubscribed = sub.getJid().equals(userName);
             }
-            
+
             pubSubNode.addItemEventListener(listener);
-            
+
             if (!alreadySubscribed) {
                 try {
                     LOGGER.log(Level.INFO, "Creating subscription for destination");
                     pubSubNode.subscribe(userName);
                 } catch (XMPPException failedToSub) {
-                    LOGGER.log(Level.SEVERE, "JID: "+userName+ " to node: "+pubSubNode.getId());
+                    LOGGER.log(Level.SEVERE, "JID: " + userName + " to node: " + pubSubNode.getId());
                 }
-            }
-            else {
+            } else {
                 LOGGER.log(Level.INFO, "Found existing subscription for destination");
             }
-            
+
         } catch (XMPPException failedToGetSubscriptions) {
-           LOGGER.log(Level.SEVERE, "Failed to find subscriptions for node: "+pubSubNode.getId());
+            LOGGER.log(Level.SEVERE, "Failed to find subscriptions for node: " + pubSubNode.getId());
         }
     }
 
@@ -134,11 +130,10 @@ public class PubSubFixedNameNode extends AbstractFeature {
                 try {
                     pubSubNode = mgr.createNode(serviceName);
                 } catch (XMPPException failedToCreateNode) {
-                    LOGGER.log(Level.SEVERE, "Failed to create node: "+ serviceName, failedToCreateNode);
+                    LOGGER.log(Level.SEVERE, "Failed to create node: " + serviceName, failedToCreateNode);
                 }
-            }
-            else {
-                LOGGER.log(Level.WARNING, "Not creating node that wasn't found: "+serviceName);
+            } else {
+                LOGGER.log(Level.WARNING, "Not creating node that wasn't found: " + serviceName);
             }
         }
         return pubSubNode;

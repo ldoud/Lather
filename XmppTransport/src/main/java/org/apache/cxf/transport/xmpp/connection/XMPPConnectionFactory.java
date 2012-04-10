@@ -24,13 +24,14 @@ import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 
 /**
- * This factory encapsulates if the XMPP connection is shared,
- * the credentials used to login, and how the resource name is generated.
+ * This factory encapsulates if the XMPP connection is shared, the credentials used to login, and how the
+ * resource name is generated.
  */
 public interface XMPPConnectionFactory {
-    
+
     /**
      * Provides a XMPP connection that is already logged in.
+     * 
      * @return A connection that might be shared, so don't close it.
      * @throws XMPPException If the login fails.
      */

@@ -26,6 +26,7 @@ public class SoapPacket extends IQ {
 
     /**
      * {@inheritDoc}
+     * 
      * @see IQ
      */
     @Override
@@ -39,6 +40,7 @@ public class SoapPacket extends IQ {
 
     /**
      * {@inheritDoc}
+     * 
      * @see IQ
      */
     @Override

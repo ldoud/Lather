@@ -25,12 +25,13 @@ import org.jivesoftware.smack.XMPPConnection;
  * Classes that require XMPP connection feature.
  */
 public interface XMPPConnectionUser {
-    
+
     /**
-     * This maybe called multiple times during initialization.
-     * Therefore the factory should not be used until the server is started.
+     * This maybe called multiple times during initialization. Therefore the factory should not be used until
+     * the server is started.
+     * 
      * @param factory Factory that is used for creating connections.
      */
     public void setXmppConnection(XMPPConnection conn);
-    
+
 }

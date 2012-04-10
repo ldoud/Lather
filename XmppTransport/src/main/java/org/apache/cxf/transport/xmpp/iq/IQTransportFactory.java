@@ -47,12 +47,12 @@ import org.jivesoftware.smack.provider.ProviderManager;
  * 
  * @author Leon Doud
  */
-public class IQTransportFactory extends AbstractTransportFactory 
-    implements DestinationFactory, ConduitInitiator, XMPPTransportFactory {
-    
+public class IQTransportFactory extends AbstractTransportFactory implements DestinationFactory,
+    ConduitInitiator, XMPPTransportFactory {
+
     public static final List<String> DEFAULT_NAMESPACES = Arrays
-    .asList("http://cxf.apache.org/transports/xmpp");
-    
+        .asList("http://cxf.apache.org/transports/xmpp");
+
     private XMPPConnectionFactory destinationConnectionFactory;
     private XMPPConnectionFactory conduitConnectionFactory;
 
@@ -81,13 +81,13 @@ public class IQTransportFactory extends AbstractTransportFactory
      */
     public Destination getDestination(EndpointInfo endpointInfo) throws IOException {
         IQDestination dest = new IQDestination(endpointInfo);
-        
+
         try {
             dest.setXmppConnection(destinationConnectionFactory.login(endpointInfo));
         } catch (XMPPException e) {
-           throw new IOException(e);
+            throw new IOException(e);
         }
-        
+
         return dest;
     }
 
@@ -105,23 +105,24 @@ public class IQTransportFactory extends AbstractTransportFactory
      * the bus.
      */
     @Override
-    public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType endpointType) throws IOException {
+    public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType endpointType)
+        throws IOException {
         IQClientConduit conduit = new IQClientConduit(endpointType);
-        
+
         try {
             conduit.setXmppConnection(conduitConnectionFactory.login(endpointInfo));
         } catch (XMPPException e) {
-           throw new IOException(e);
+            throw new IOException(e);
         }
-        
-        return conduit;        
+
+        return conduit;
     }
 
     @Override
     public void setDestinationConnectionFactory(XMPPConnectionFactory factory) {
         destinationConnectionFactory = factory;
     }
-    
+
     @Override
     public void setConduitConnectionFactory(XMPPConnectionFactory factory) {
         conduitConnectionFactory = factory;

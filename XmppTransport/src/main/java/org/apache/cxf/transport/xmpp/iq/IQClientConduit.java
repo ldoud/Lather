@@ -41,13 +41,13 @@ import org.jivesoftware.smack.filter.PacketFilter;
 import org.jivesoftware.smack.packet.Packet;
 
 public class IQClientConduit extends AbstractConduit implements PacketListener {
-    
+
     private static final Logger LOGGER = LogUtils.getLogger(IQClientConduit.class);
 
     // Messages sent to the service are stored in this table based on
     // their PacketId so they can be retrieved when a response is received.
     private AbstractMap<String, Exchange> exchangeCorrelationTable = new HashMap<String, Exchange>();
-    
+
     public IQClientConduit(EndpointReferenceType target) {
         super(target);
     }
@@ -62,7 +62,7 @@ public class IQClientConduit extends AbstractConduit implements PacketListener {
             }
         });
     }
-    
+
     @Override
     public void close(Message msg) throws IOException {
         // Take the contents of the cached buffer
@@ -83,7 +83,7 @@ public class IQClientConduit extends AbstractConduit implements PacketListener {
             // discovery implementation class and have it return
             // the dynamic endpoint address as a full JID.
             String fullJid = getTarget().getAddress().getValue();
-            LOGGER.info("Sending message to JID: "+fullJid);
+            LOGGER.info("Sending message to JID: " + fullJid);
             soapOverXmpp.setTo(fullJid);
 
             // Save the message so it can be used when the response is received.
