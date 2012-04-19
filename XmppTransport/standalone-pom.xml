@@ -22,13 +22,19 @@
         <!-- Add the resource directory for demos. -->
         <resources>
             <resource>
-                <directory>src/main/resources</directory>
+                <directory>src/main/resources</directory>                
             </resource>
             <resource>
                 <directory>src/test/resources</directory>
+                <excludes>
+                    <exclude>**/*</exclude>
+                </excludes>
             </resource>
             <resource>
                 <directory>src/demo/resources</directory>
+                <excludes>
+                    <exclude>**/*</exclude>
+                </excludes>
             </resource>            
         </resources>
         <!-- Add the source directory for demos. -->
