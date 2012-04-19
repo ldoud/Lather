@@ -13,14 +13,52 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.apache.cxf</groupId>
 	<artifactId>cxf-rt-transports-xmpp</artifactId>
-    <version>2.3.9</version>
-    <name>Apache CXF Runtime XMPP Transport</name>
-    <url>http://cxf.apache.org</url>
+        <version>2.3.9</version>
+        <name>Apache CXF Runtime XMPP Transport</name>
+        <url>http://cxf.apache.org</url>
+    
+    
+    <build>
+        <!-- Add the resource directory for demos. -->
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>src/test/resources</directory>
+            </resource>
+            <resource>
+                <directory>src/demo/resources</directory>
+            </resource>            
+        </resources>
+        <!-- Add the source directory for demos. -->
+    	<plugins>
+    	   <plugin>
+    	       <groupId>org.codehaus.mojo</groupId>
+               <artifactId>build-helper-maven-plugin</artifactId>
+               <version>1.4</version>
+               <executions>
+                   <execution>
+                       <id>add-demo-source</id>
+                       <phase>generate-sources</phase>
+                       <goals>
+                           <goal>add-source</goal>
+                       </goals>
+                       <configuration>
+                           <sources>
+                               <source>${basedir}/src/demo/java</source>
+                           </sources>
+                       </configuration>
+                   </execution>
+               </executions>
+           </plugin>
+    	</plugins>
+    </build>
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    
+   
     <dependencies>
         <dependency>
             <groupId>junit</groupId>
