@@ -27,12 +27,14 @@
             <resource>
                 <directory>src/test/resources</directory>
                 <excludes>
+                    <!-- Keeps these resources out of the jar. -->
                     <exclude>**/*</exclude>
                 </excludes>
             </resource>
             <resource>
                 <directory>src/demo/resources</directory>
                 <excludes>
+                     <!-- Keeps these resources out of the jar. -->
                     <exclude>**/*</exclude>
                 </excludes>
             </resource>            
@@ -58,7 +60,19 @@
                    </execution>
                </executions>
            </plugin>
+           <!-- Don't include test items in the jar. -->
+           <plugin>
+               <groupId>org.apache.maven.plugins</groupId>
+               <artifactId>maven-jar-plugin</artifactId>
+               <version>2.4</version>
+               <configuration>
+                   <excludes>
+                       <exclude>test/**</exclude>
+                   </excludes>
+               </configuration>
+           </plugin>
     	</plugins>
+    	
     </build>
     
     <properties>
