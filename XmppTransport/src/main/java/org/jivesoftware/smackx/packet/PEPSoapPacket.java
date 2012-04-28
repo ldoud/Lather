@@ -34,7 +34,7 @@ public class PEPSoapPacket extends PEPItem implements PacketExtension {
     
     @Override
     public String getElementName() {
-        return "Envelope";
+        return "item";
     }
 
     @Override
