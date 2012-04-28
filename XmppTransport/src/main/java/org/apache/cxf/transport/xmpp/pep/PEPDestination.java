@@ -17,35 +17,21 @@
  * under the License.
  */
 
-package org.apache.cxf.transport.xmpp.smackx.soap;
+package org.apache.cxf.transport.xmpp.pep;
 
-import org.jivesoftware.smack.packet.IQ;
+import org.apache.cxf.service.model.EndpointInfo;
+import org.apache.cxf.transport.xmpp.common.AbstractDestination;
+import org.jivesoftware.smackx.PEPListener;
+import org.jivesoftware.smackx.packet.PEPEvent;
 
-public class SoapPacket extends IQ  {
-    private String soapEnvelope;
+public class PEPDestination extends AbstractDestination implements PEPListener{
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see IQ
-     */
+    public PEPDestination(EndpointInfo epInfo) {
+        super(epInfo);
+    }
+    
     @Override
-    public String getXmlns() {
-        return "http://www.w3.org/2003/05/soap-envelope";
+    public void eventReceived(String from, PEPEvent event) {
+        System.out.println("Received: "+event.toXML());
     }
-
-    public void setEnvelope(String envelope) {
-        soapEnvelope = envelope;
-    }
-
-    /**
-     * {@inheritDoc}
-     * 
-     * @see IQ
-     */
-    @Override
-    public String getChildElementXML() {
-        return soapEnvelope;
-    }
-
 }

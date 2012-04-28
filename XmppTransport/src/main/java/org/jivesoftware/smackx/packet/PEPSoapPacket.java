@@ -17,35 +17,43 @@
  * under the License.
  */
 
-package org.apache.cxf.transport.xmpp.smackx.soap;
+package org.jivesoftware.smackx.packet;
 
-import org.jivesoftware.smack.packet.IQ;
+import org.jivesoftware.smack.packet.PacketExtension;
+import org.jivesoftware.smack.util.StringUtils;
 
-public class SoapPacket extends IQ  {
-    private String soapEnvelope;
+public class PEPSoapPacket extends PEPItem implements PacketExtension {
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see IQ
-     */
+    private String node;
+    private String itemDetailsXML;
+    
+    public PEPSoapPacket(String nodeName) {
+        super(StringUtils.randomString(7));
+        node = nodeName;
+    }
+    
     @Override
-    public String getXmlns() {
+    public String getElementName() {
+        return "Envelope";
+    }
+
+    @Override
+    public String getNamespace() {
         return "http://www.w3.org/2003/05/soap-envelope";
     }
-
-    public void setEnvelope(String envelope) {
-        soapEnvelope = envelope;
+    
+    public void setItemDetailsXML(String detailsXML) {
+        itemDetailsXML = detailsXML;
     }
 
-    /**
-     * {@inheritDoc}
-     * 
-     * @see IQ
-     */
     @Override
-    public String getChildElementXML() {
-        return soapEnvelope;
+    String getItemDetailsXML() {
+        return itemDetailsXML;
+    }
+
+    @Override
+    String getNode() {
+        return node;
     }
 
 }
