@@ -38,7 +38,10 @@ import org.apache.cxf.ws.addressing.EndpointReferenceType;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
 import org.jivesoftware.smack.provider.ProviderManager;
+import org.jivesoftware.smackx.PEPListener;
 import org.jivesoftware.smackx.PEPManager;
+import org.jivesoftware.smackx.ServiceDiscoveryManager;
+import org.jivesoftware.smackx.packet.PEPEvent;
 import org.jivesoftware.smackx.provider.PEPProvider;
 
 /**
@@ -80,12 +83,21 @@ public class PEPTransportFactory extends AbstractTransportFactory implements Des
     /**
      * Creates a destination for a service that receives XMPP messages.
      */
-    public Destination getDestination(EndpointInfo endpointInfo) throws IOException {
-        PEPDestination dest = new PEPDestination(endpointInfo);
-        pepProvider.registerPEPParserExtension(endpointInfo.getService().getName().toString(), soapProvider);        
+    public Destination getDestination(EndpointInfo endpointInfo) throws IOException { 
+        // The node name is the full name of the service.
+        String nodeName = endpointInfo.getService().getName().toString();
+        pepProvider.registerPEPParserExtension(nodeName, soapProvider);
+       
+        PEPDestination dest = new PEPDestination(endpointInfo);       
         
         try {            
             XMPPConnection conn = destinationConnectionFactory.login(endpointInfo);
+            
+            // Advertise interest in receiving information.
+            ServiceDiscoveryManager disco = ServiceDiscoveryManager.getInstanceFor(conn);
+            disco.addFeature(nodeName+"+notify");            
+            
+            // Create destination.
             dest.setXmppConnection(conn);
             
             PEPManager mgr = new PEPManager(conn);
@@ -124,6 +136,14 @@ public class PEPTransportFactory extends AbstractTransportFactory implements Des
             PEPManager mgr = new PEPManager(conn);
             PEPClientConduit conduit = new PEPClientConduit(endpointType, mgr, nodeName);
             conduit.setXmppConnection(conn);
+            
+            mgr.addPEPListener(new PEPListener() {
+                
+                @Override
+                public void eventReceived(String arg0, PEPEvent event) {
+                    System.out.println("Client received: "+event.toXML());
+                }
+            });
             
             return conduit;
 
