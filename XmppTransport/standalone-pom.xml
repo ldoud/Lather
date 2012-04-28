@@ -26,17 +26,9 @@
             </resource>
             <resource>
                 <directory>src/test/resources</directory>
-                <excludes>
-                    <!-- Keeps these resources out of the jar. -->
-                    <exclude>**/*</exclude>
-                </excludes>
             </resource>
             <resource>
                 <directory>src/demo/resources</directory>
-                <excludes>
-                     <!-- Keeps these resources out of the jar. -->
-                    <exclude>**/*</exclude>
-                </excludes>
             </resource>            
         </resources>
         <!-- Add the source directory for demos. -->
@@ -67,7 +59,11 @@
                <version>2.4</version>
                <configuration>
                    <excludes>
-                       <exclude>test/**</exclude>
+                      <exclude>test/**</exclude>
+                      <exclude>demo/**</exclude>
+                      <exclude>*applicationContext.xml</exclude>
+                      <exclude>test-message.xml</exclude>
+                      <exclude>xmpp-embedded-broker.xml</exclude>
                    </excludes>
                </configuration>
            </plugin>
