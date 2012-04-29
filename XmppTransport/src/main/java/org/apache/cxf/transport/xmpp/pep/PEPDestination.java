@@ -58,6 +58,7 @@ public class PEPDestination extends AbstractDestination implements PacketListene
             for(PacketExtension pe : extensions) {
                 if (pe instanceof ItemsExtension) {
                     ItemsExtension ie = (ItemsExtension)pe;
+                    @SuppressWarnings("unchecked")
                     List<PayloadItem<SimplePayload>> items = (List<PayloadItem<SimplePayload>> )ie.getItems();
                     invokeSoapMessages(items);
                 }
