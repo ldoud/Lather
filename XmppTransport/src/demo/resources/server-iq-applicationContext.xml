@@ -27,7 +27,7 @@
     <cxf:bus name="cxf"/>
     
     <bean class="org.apache.cxf.transport.xmpp.connection.BasicConnectionFactory" name="connectionFactory">
-		<property name="xmppServiceName" value="localhost.localdomain"/>
+		<property name="xmppServiceName" value="localhost"/>
 		<property name="xmppUsername" value="service1"/>
 		<property name="xmppPassword" value="service1"/>	
 		<property name="bus" ref="cxf"/>		

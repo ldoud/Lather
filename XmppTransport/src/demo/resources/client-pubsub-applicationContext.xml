@@ -27,7 +27,7 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd"
     <cxf:bus name="cxf"/>
     
     <bean class="org.apache.cxf.transport.xmpp.connection.BasicConnectionFactory" name="connectionFactory">
-		<property name="xmppServiceName" value="localhost.localdomain"/>
+		<property name="xmppServiceName" value="localhost"/>
 		<property name="xmppUsername" value="user1"/>
 		<property name="xmppPassword" value="user1"/>	
 		<property name="bus" ref="cxf"/>		
