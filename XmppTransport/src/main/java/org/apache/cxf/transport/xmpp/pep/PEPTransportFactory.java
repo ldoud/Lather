@@ -50,6 +50,9 @@ import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.packet.PEPEvent;
 import org.jivesoftware.smackx.provider.PEPProvider;
 import org.jivesoftware.smackx.pubsub.EventElement;
+import org.jivesoftware.smackx.pubsub.ItemsExtension;
+import org.jivesoftware.smackx.pubsub.PayloadItem;
+import org.jivesoftware.smackx.pubsub.SimplePayload;
 
 /**
  * Creates both XMPP destinations for servers and conduits for clients. Web service providers or web service
@@ -95,7 +98,7 @@ public class PEPTransportFactory extends AbstractTransportFactory implements Des
         final String nodeName = endpointInfo.getService().getName().toString();
         pepProvider.registerPEPParserExtension(nodeName, soapProvider);
        
-        PEPDestination dest = new PEPDestination(endpointInfo);       
+        final PEPDestination dest = new PEPDestination(endpointInfo);       
         
         try {            
 //            XMPPConnection conn = destinationConnectionFactory.login(endpointInfo);
@@ -109,27 +112,7 @@ public class PEPTransportFactory extends AbstractTransportFactory implements Des
             // Create destination.
             dest.setXmppConnection(conn);
 
-            conn.addPacketListener(new PacketListener() {
-                
-                @Override
-                public void processPacket(Packet p) {
-                    
-                    Message msg = (Message)p;
-                    try {
-                        EventElement event = (EventElement)msg.getExtension(
-                            "event", "http://jabber.org/protocol/pubsub#event");
-                        
-                        String eventNode = event.getEvent().getNode();
-                        if(nodeName.equals(event.getEvent().getNode())) {
-                            System.out.println("event packet: "+event.toXML());
-                        }
-                    }
-                    catch(Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            },
-            new PacketExtensionFilter("event", "http://jabber.org/protocol/pubsub#event"));
+            conn.addPacketListener(dest, new PacketExtensionFilter("event", "http://jabber.org/protocol/pubsub#event"));
             
             conn.login("user1", "user1", nodeName);
 
