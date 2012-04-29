@@ -35,14 +35,21 @@ import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.xmpp.connection.XMPPConnectionFactory;
 import org.apache.cxf.transport.xmpp.connection.XMPPTransportFactory;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.jivesoftware.smack.PacketListener;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smack.filter.PacketExtensionFilter;
+import org.jivesoftware.smack.filter.PacketFilter;
+import org.jivesoftware.smack.packet.Message;
+import org.jivesoftware.smack.packet.Packet;
+import org.jivesoftware.smack.packet.PacketExtension;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smackx.PEPListener;
 import org.jivesoftware.smackx.PEPManager;
 import org.jivesoftware.smackx.ServiceDiscoveryManager;
 import org.jivesoftware.smackx.packet.PEPEvent;
 import org.jivesoftware.smackx.provider.PEPProvider;
+import org.jivesoftware.smackx.pubsub.EventElement;
 
 /**
  * Creates both XMPP destinations for servers and conduits for clients. Web service providers or web service
@@ -68,8 +75,8 @@ public class PEPTransportFactory extends AbstractTransportFactory implements Des
         super();
         setTransportIds(DEFAULT_NAMESPACES);
        
-        ProviderManager.getInstance().addExtensionProvider(
-            "event", "http://jabber.org/protocol/pubsub#event", pepProvider);
+//        ProviderManager.getInstance().addExtensionProvider(
+//            "event", "http://jabber.org/protocol/pubsub#event", pepProvider);
     }
 
     /**
@@ -85,13 +92,15 @@ public class PEPTransportFactory extends AbstractTransportFactory implements Des
      */
     public Destination getDestination(EndpointInfo endpointInfo) throws IOException { 
         // The node name is the full name of the service.
-        String nodeName = endpointInfo.getService().getName().toString();
+        final String nodeName = endpointInfo.getService().getName().toString();
         pepProvider.registerPEPParserExtension(nodeName, soapProvider);
        
         PEPDestination dest = new PEPDestination(endpointInfo);       
         
         try {            
-            XMPPConnection conn = destinationConnectionFactory.login(endpointInfo);
+//            XMPPConnection conn = destinationConnectionFactory.login(endpointInfo);
+            XMPPConnection conn = new XMPPConnection("localhost");
+            conn.connect();
             
             // Advertise interest in receiving information.
             ServiceDiscoveryManager disco = ServiceDiscoveryManager.getInstanceFor(conn);
@@ -99,9 +108,30 @@ public class PEPTransportFactory extends AbstractTransportFactory implements Des
             
             // Create destination.
             dest.setXmppConnection(conn);
+
+            conn.addPacketListener(new PacketListener() {
+                
+                @Override
+                public void processPacket(Packet p) {
+                    
+                    Message msg = (Message)p;
+                    try {
+                        EventElement event = (EventElement)msg.getExtension(
+                            "event", "http://jabber.org/protocol/pubsub#event");
+                        
+                        String eventNode = event.getEvent().getNode();
+                        if(nodeName.equals(event.getEvent().getNode())) {
+                            System.out.println("event packet: "+event.toXML());
+                        }
+                    }
+                    catch(Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            },
+            new PacketExtensionFilter("event", "http://jabber.org/protocol/pubsub#event"));
             
-            PEPManager mgr = new PEPManager(conn);
-            mgr.addPEPListener(dest);
+            conn.login("user1", "user1", nodeName);
 
         } catch (XMPPException e) {
             throw new IOException(e);
@@ -127,7 +157,7 @@ public class PEPTransportFactory extends AbstractTransportFactory implements Des
     public Conduit getConduit(EndpointInfo endpointInfo, EndpointReferenceType endpointType)
         throws IOException {
         
-        String nodeName = endpointInfo.getService().getName().toString();
+        String nodeName = endpointInfo.getInterface().getName().toString();
         pepProvider.registerPEPParserExtension(nodeName, soapProvider);
 
         try {
