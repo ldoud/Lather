@@ -13,7 +13,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.apache.cxf</groupId>
 	<artifactId>cxf-rt-transports-xmpp</artifactId>
-        <version>2.3.9</version>
+        <version>1.1</version>
         <name>Apache CXF Runtime XMPP Transport</name>
         <url>http://cxf.apache.org</url>
     
