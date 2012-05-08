@@ -19,6 +19,7 @@
 
 package org.apache.cxf.transport.xmpp.pubsub;
 
+import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
@@ -34,6 +35,9 @@ import org.apache.cxf.transport.Destination;
 import org.apache.cxf.transport.xmpp.connection.XMPPConnectionFactory;
 import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smackx.Form;
+import org.jivesoftware.smackx.FormField;
+import org.jivesoftware.smackx.pubsub.ConfigureForm;
 import org.jivesoftware.smackx.pubsub.LeafNode;
 import org.jivesoftware.smackx.pubsub.Node;
 import org.jivesoftware.smackx.pubsub.PubSubManager;
@@ -78,6 +82,11 @@ public class PubSubFixedNameNode extends AbstractFeature {
 
                 if (pubSubNode != null) {
                     findOrCreateSubscription((ItemEventListener<?>)dest, connection, pubSubNode);
+                    
+//                    String fieldName = "pubsub#send_item_subscribe";
+//                    ConfigureForm form = pubSubNode.getNodeConfiguration();
+//                    LOGGER.info(form.toString());
+//                    LOGGER.info(fieldName+" "+form.getField(fieldName).getValues().next());
                 }
             } else {
                 LOGGER.log(Level.WARNING, "This feature is only for PubSubDestinations");
@@ -142,12 +151,26 @@ public class PubSubFixedNameNode extends AbstractFeature {
     private Node findOrCreateNode(String serviceName, XMPPConnection connection) {
         PubSubManager mgr = new PubSubManager(connection);
         Node pubSubNode = null;
-        try {
+        try {            
             pubSubNode = mgr.getNode(serviceName);
         } catch (XMPPException failedToFindNode) {
             if (createIfMissing) {
                 try {
-                    pubSubNode = mgr.createNode(serviceName);
+//                    String fieldName = "pubsub#send_last_published_item";
+                    String fieldName = "pubsub#send_item_subscribe";
+                    FormField lastValueQueue = new FormField(fieldName);
+//                    lastValueQueue.setType(FormField.TYPE_LIST_SINGLE);
+                    lastValueQueue.setType(FormField.TYPE_BOOLEAN);
+                                                      
+                    Form createForm = new Form(Form.TYPE_SUBMIT);
+                    createForm.addField(lastValueQueue);
+                    
+//                    List<String> answer = new ArrayList<String>(1);
+//                    answer.add("never");
+                    boolean answer = false;
+                    createForm.setAnswer(fieldName, answer);
+                    
+                    pubSubNode = mgr.createNode(serviceName, new ConfigureForm(createForm));
                 } catch (XMPPException failedToCreateNode) {
                     LOGGER.log(Level.SEVERE, "Failed to create node: " + serviceName, failedToCreateNode);
                 }

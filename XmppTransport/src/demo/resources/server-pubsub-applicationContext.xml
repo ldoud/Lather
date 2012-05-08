@@ -46,6 +46,7 @@
 		<jaxws:features>
         	<bean class="org.apache.cxf.transport.xmpp.pubsub.PubSubFixedNameNode">
         		<property name="nodeName" value="DemoNode"/>
+        		<property name="createIfMissing" value="false"/>
         		<property name="connectionFactory" ref="connectionFactory"/>
         	</bean>
         </jaxws:features>
