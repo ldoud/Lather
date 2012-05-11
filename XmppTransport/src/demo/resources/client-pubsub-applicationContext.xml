@@ -28,8 +28,8 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd"
     
     <bean class="org.apache.cxf.transport.xmpp.connection.BasicConnectionFactory" name="connectionFactory">
 		<property name="xmppServiceName" value="localhost"/>
-		<property name="xmppUsername" value="user1"/>
-		<property name="xmppPassword" value="user1"/>	
+		<property name="xmppUsername" value="service1"/>
+		<property name="xmppPassword" value="service1"/>	
 		<property name="bus" ref="cxf"/>		
 	</bean>
     
@@ -43,10 +43,9 @@ http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd"
         serviceClass="test.xmpp.service.HelloWorld"
         transportId="http://cxf.apache.org/transports/xmpp/pubsub">
         <jaxws:features>
-        	<bean class="org.apache.cxf.transport.xmpp.pubsub.PubSubFixedNameNode">
-        		<property name="nodeName" value="DemoNode"/>
-        		<property name="connectionFactory" ref="connectionFactory"/>
-        	</bean>
+            <bean class="org.apache.cxf.transport.xmpp.pubsub.PubSubServiceNode">
+                <property name="connectionFactory" ref="connectionFactory"/>
+            </bean>
         </jaxws:features>
     </jaxws:client>
 	

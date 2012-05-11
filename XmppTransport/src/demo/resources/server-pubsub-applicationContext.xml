@@ -44,9 +44,7 @@
 		transportId="http://cxf.apache.org/transports/xmpp/pubsub"
 		implementor="test.xmpp.service.HelloWorldService">
 		<jaxws:features>
-        	<bean class="org.apache.cxf.transport.xmpp.pubsub.PubSubFixedNameNode">
-        		<property name="nodeName" value="DemoNode"/>
-        		<property name="createIfMissing" value="false"/>
+        	<bean class="org.apache.cxf.transport.xmpp.pubsub.PubSubServiceNode">
         		<property name="connectionFactory" ref="connectionFactory"/>
         	</bean>
         </jaxws:features>

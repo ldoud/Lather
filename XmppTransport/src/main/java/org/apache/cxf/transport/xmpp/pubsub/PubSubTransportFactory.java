@@ -35,7 +35,9 @@ import org.apache.cxf.transport.DestinationFactory;
 import org.apache.cxf.transport.xmpp.connection.XMPPConnectionFactory;
 import org.apache.cxf.transport.xmpp.connection.XMPPTransportFactory;
 import org.apache.cxf.ws.addressing.EndpointReferenceType;
+import org.jivesoftware.smack.XMPPConnection;
 import org.jivesoftware.smack.XMPPException;
+import org.jivesoftware.smackx.ServiceDiscoveryManager;
 
 /**
  * Creates both XMPP destinations for servers and conduits for clients. Web service providers or web service
@@ -71,10 +73,18 @@ public class PubSubTransportFactory extends AbstractTransportFactory implements 
      * Creates a destination for a service that receives XMPP messages.
      */
     public Destination getDestination(EndpointInfo endpointInfo) throws IOException {
+        // The node name is the full name of the service.
+        String nodeName = endpointInfo.getService().getName().toString();
+        
         PubSubDestination dest = new PubSubDestination(endpointInfo);
 
         try {
-            dest.setXmppConnection(destinationConnectionFactory.login(endpointInfo));
+            XMPPConnection conn = destinationConnectionFactory.login(endpointInfo);
+            dest.setXmppConnection(conn);
+            
+            // Advertise interest in receiving information.
+            ServiceDiscoveryManager disco = ServiceDiscoveryManager.getInstanceFor(conn);
+            disco.addFeature(nodeName+"+notify");   
 
         } catch (XMPPException e) {
             throw new IOException(e);
