@@ -19,9 +19,7 @@
 
 package org.apache.cxf.transport.xmpp.pubsub;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -47,15 +45,12 @@ import org.jivesoftware.smack.packet.Presence;
 import org.jivesoftware.smack.provider.ProviderManager;
 import org.jivesoftware.smackx.Form;
 import org.jivesoftware.smackx.FormField;
-import org.jivesoftware.smackx.ServiceDiscoveryManager;
+import org.jivesoftware.smackx.pubsub.Affiliation;
 import org.jivesoftware.smackx.pubsub.ConfigureForm;
 import org.jivesoftware.smackx.pubsub.LeafNode;
 import org.jivesoftware.smackx.pubsub.Node;
 import org.jivesoftware.smackx.pubsub.PubSubManager;
-import org.jivesoftware.smackx.pubsub.Subscription;
 import org.jivesoftware.smackx.pubsub.listener.ItemEventListener;
-
-import com.sun.corba.se.pept.transport.Connection;
 
 public class PubSubServiceNode extends AbstractFeature {
 
@@ -86,6 +81,7 @@ public class PubSubServiceNode extends AbstractFeature {
         Destination dest = server.getDestination();
         try {
             if (dest instanceof ItemEventListener<?>) {
+                final ItemEventListener<?> listener = (ItemEventListener<?>)dest;
                 final XMPPConnection connection = connectionFactory.login(server.getEndpoint().getEndpointInfo());
                 
                 // Listen for notification of new nodes.
@@ -95,7 +91,7 @@ public class PubSubServiceNode extends AbstractFeature {
                         LOGGER.info("Received node notification packet: "+p.toXML());
                         NodeNotificationPacket notification = (NodeNotificationPacket)p;
                         if (serviceName.equals(notification.getServiceName())) {
-                            subscribeToNode(notification.getNodeName(), connection);
+                            subscribeToNode(notification.getNodeName(), listener, connection);
                         }                        
                     }
                 }, new PacketFilter() {
@@ -104,12 +100,7 @@ public class PubSubServiceNode extends AbstractFeature {
                         return p instanceof NodeNotificationPacket;
                     }
                 });
-                
-                // Advertise interest in receiving information.
-                ServiceDiscoveryManager disco = ServiceDiscoveryManager.getInstanceFor(connection);
-                disco.addFeature(serviceName+"+notify");  
-                
-                LOGGER.log(Level.INFO, "Attempting to discover service: " + serviceName);
+              
             } else {
                 LOGGER.log(Level.WARNING, "This feature is only for PubSubDestinations");
             }
@@ -217,7 +208,32 @@ public class PubSubServiceNode extends AbstractFeature {
     }
 
         
-    private void subscribeToNode(String nodeName, XMPPConnection connection) {
-        
+    private void subscribeToNode(String nodeName, ItemEventListener<?> listener, XMPPConnection connection) {
+        PubSubManager mgr = new PubSubManager(connection);
+        try {
+            boolean alreadySubscribed = false;
+            try {
+                List<Affiliation> affiliations = mgr.getAffiliations();
+                for(Affiliation aff : affiliations) {
+                    
+                    if (nodeName.equals(aff.getNodeId())) {
+                        alreadySubscribed = true;
+                    }
+                }
+            } catch (XMPPException e) {
+                // No affiliations causes an exception. :(
+                // An empty list would have been nicer.
+            }
+            
+            if (!alreadySubscribed) {                
+                LeafNode node = (LeafNode)mgr.getNode(nodeName);
+                node.addItemEventListener(listener);
+                node.subscribe(connection.getUser());
+                LOGGER.info("Subscribed to: "+nodeName+" as user: "+connection.getUser());
+            }
+            
+        } catch (XMPPException e) {
+            LOGGER.log(Level.SEVERE, "Unable to subscribe to node", e);
+        }
     }
 }
