@@ -24,8 +24,8 @@ import javax.jws.WebService;
 
 @WebService
 public interface HelloWorld {
-    public String sayHi(String text);
+    String sayHi(String text);
     
     @Oneway
-    public void yell(String loudMsg);
+    void yell(String loudMsg);
 }

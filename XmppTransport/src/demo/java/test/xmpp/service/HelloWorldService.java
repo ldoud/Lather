@@ -33,6 +33,6 @@ public class HelloWorldService implements HelloWorld {
 
     @Override
     public void yell(String loudMsg) {
-        System.out.println("Yelling: "+loudMsg);
+        System.out.println("Yelling: " + loudMsg);
     }
 }
