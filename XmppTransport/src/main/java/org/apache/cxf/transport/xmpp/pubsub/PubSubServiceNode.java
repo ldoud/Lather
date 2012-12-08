@@ -71,8 +71,10 @@ public class PubSubServiceNode extends AbstractFeature {
     @Override
     public void initialize(Server server, Bus bus) {
         ProviderManager mgr = ProviderManager.getInstance();
-        if (mgr.getIQProvider(NodeNotificationPacket.ROOT_ELEMENT, NodeNotificationPacket.NAMESPACE) == null) {
-            mgr.addIQProvider(NodeNotificationPacket.ROOT_ELEMENT, NodeNotificationPacket.NAMESPACE, new NodeNotificationProvider());            
+        if (mgr.getIQProvider(NodeNotificationPacket.ROOT_ELEMENT,
+            NodeNotificationPacket.NAMESPACE) == null) {
+            mgr.addIQProvider(NodeNotificationPacket.ROOT_ELEMENT, NodeNotificationPacket.NAMESPACE, 
+                              new NodeNotificationProvider());            
         }
 
         // The node name is the full name of the service.        
@@ -82,13 +84,14 @@ public class PubSubServiceNode extends AbstractFeature {
         try {
             if (dest instanceof ItemEventListener<?>) {
                 final ItemEventListener<?> listener = (ItemEventListener<?>)dest;
-                final XMPPConnection connection = connectionFactory.login(server.getEndpoint().getEndpointInfo());
+                final XMPPConnection connection = 
+                     connectionFactory.login(server.getEndpoint().getEndpointInfo());
                 
                 // Listen for notification of new nodes.
                 connection.addPacketListener(new PacketListener() {                    
                     @Override
                     public void processPacket(Packet p) {
-                        LOGGER.info("Received node notification packet: "+p.toXML());
+                        LOGGER.info("Received node notification packet: " + p.toXML());
                         NodeNotificationPacket notification = (NodeNotificationPacket)p;
                         if (serviceName.equals(notification.getServiceName())) {
                             subscribeToNode(notification.getNodeName(), listener, connection);
@@ -117,7 +120,8 @@ public class PubSubServiceNode extends AbstractFeature {
         try {
             if (conduit instanceof PubSubClientConduit) {
 
-                final XMPPConnection connection = connectionFactory.login(client.getEndpoint().getEndpointInfo());
+                final XMPPConnection connection = connectionFactory.login(
+                      client.getEndpoint().getEndpointInfo());
                 
                 // Create a node name based on the service name.
                 String fullJID = connection.getUser();
@@ -164,7 +168,7 @@ public class PubSubServiceNode extends AbstractFeature {
                     
                     Roster roster = connection.getRoster();
                     Collection<RosterEntry> entries = roster.getEntries();
-                    for(RosterEntry entry : entries) {
+                    for (RosterEntry entry : entries) {
                         packet.setTo(entry.getUser());
                         connection.sendPacket(packet);
                         LOGGER.log(Level.INFO, "Sent node notification to roster entry: " + entry.getUser());
@@ -214,7 +218,7 @@ public class PubSubServiceNode extends AbstractFeature {
             boolean alreadySubscribed = false;
             try {
                 List<Affiliation> affiliations = mgr.getAffiliations();
-                for(Affiliation aff : affiliations) {
+                for (Affiliation aff : affiliations) {
                     
                     if (nodeName.equals(aff.getNodeId())) {
                         alreadySubscribed = true;
@@ -229,7 +233,7 @@ public class PubSubServiceNode extends AbstractFeature {
                 LeafNode node = (LeafNode)mgr.getNode(nodeName);
                 node.addItemEventListener(listener);
                 node.subscribe(connection.getUser());
-                LOGGER.info("Subscribed to: "+nodeName+" as user: "+connection.getUser());
+                LOGGER.info("Subscribed to: " + nodeName + " as user: " + connection.getUser());
             }
             
         } catch (XMPPException e) {

@@ -90,11 +90,12 @@ public class PEPTransportFactory extends AbstractTransportFactory implements Des
             
             // Advertise interest in receiving information.
             ServiceDiscoveryManager disco = ServiceDiscoveryManager.getInstanceFor(conn);
-            disco.addFeature(nodeName+"+notify");            
+            disco.addFeature(nodeName + "+notify");            
             
             // Create destination.
             dest.setXmppConnection(conn);
-            conn.addPacketListener(dest, new PacketExtensionFilter("event", "http://jabber.org/protocol/pubsub#event"));
+            conn.addPacketListener(dest, new PacketExtensionFilter("event",
+                  "http://jabber.org/protocol/pubsub#event"));
 
         } catch (XMPPException e) {
             throw new IOException(e);

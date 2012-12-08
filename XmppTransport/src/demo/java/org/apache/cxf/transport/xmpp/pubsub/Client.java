@@ -24,9 +24,13 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import test.xmpp.service.HelloWorld;
 
-public class Client {
+public final class Client {
+    private Client() {
+    }
+
     public static void main(String[] args) {
-        ApplicationContext context = new ClassPathXmlApplicationContext("client-pubsub-applicationContext.xml");
+        ApplicationContext context = new ClassPathXmlApplicationContext(
+              "client-pubsub-applicationContext.xml");
         HelloWorld client = (HelloWorld)context.getBean("helloClient");
 
         long startTime = System.currentTimeMillis();

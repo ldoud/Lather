@@ -21,7 +21,10 @@ package org.apache.cxf.transport.xmpp.pubsub;
 
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
-public class Server {
+public final class Server {
+    private Server() {
+    }
+
     public static void main(String[] args) throws Exception {
         new ClassPathXmlApplicationContext("server-pubsub-applicationContext.xml");
         Thread.sleep(30 * 60 * 1000);
